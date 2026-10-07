@@ -59,16 +59,19 @@ export abstract class Actor
             const pass: string = Library.makeHash( password.trim(), salt );
             const passengerAux: Actor$Passenger$Aux = { id: Library.getStringId(), role, name: name.trim(), email: normalizedEmail, tier: tier.level };
 
-            await Center.getMySqlClient().execute
-            (
-                "INSERT INTO Actor (id, role, name, email, salt, password) VALUES (?, ?, ?, ?, ?, ?)",
-                [passengerAux.id, passengerAux.role, passengerAux.name, normalizedEmail, salt, pass ]
-            );
-            await Center.getMySqlClient().execute
-            (
-                "INSERT INTO Actor$Passenger (id, tier) VALUES (?, ?)",
-                [passengerAux.id, passengerAux.tier]
-            );
+            await Center.getMySqlClient().withTransaction( async connection=>
+            {
+                await connection.execute
+                (
+                    "INSERT INTO Actor (id, role, name, email, salt, password) VALUES (?, ?, ?, ?, ?, ?)",
+                    [passengerAux.id, passengerAux.role, passengerAux.name, normalizedEmail, salt, pass ]
+                );
+                await connection.execute
+                (
+                    "INSERT INTO Actor$Passenger (id, tier) VALUES (?, ?)",
+                    [passengerAux.id, passengerAux.tier]
+                );
+            });
 
             Actor$Passenger.members.set( passengerAux.id, new Actor$Passenger( passengerAux.id, passengerAux.name, normalizedEmail, salt, pass, tier ) );
         
