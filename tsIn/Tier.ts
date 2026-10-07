@@ -64,6 +64,10 @@ export class Tier
     {
         return resource.minimumTier.level <= this.level;
     }
+    public toAux(): Tier$Level
+    {
+        return this._level;
+    }
     private setResources( resources: Resource[] ): void
     {
         this._resources = resources;

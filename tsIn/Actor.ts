@@ -34,7 +34,7 @@ export abstract class Actor
             else if( row.role === Actor$Role.passenger )
                 Actor$Passenger.members.set( row.id, new Actor$Passenger( row.id, row.name, row.email, row.salt, row.password, row.tier ) );
 
-            throw new Error( "Actor has invalid role" );
+            else throw new Error( "Actor has invalid role" );
         });
     }
     public static async create( caller: Actor$Crew,role: Actor$Role, name: string, email: string, password: string, tier?: Tier ): Promise<Actor>
