@@ -1,4 +1,6 @@
+import { randomBytes } from "crypto";
 import { Library } from "./Library";
+import { Center } from "./Center";
 import type { Resource } from "./Resource";
 import type { Tier, Tier$Level } from "./Tier";
 
@@ -22,11 +24,74 @@ export abstract class Actor
 
     public static async initialise(): Promise<void>
     {
-        // No initialisation required for now.
+        const [rows]: any = await Center.getMySqlClient().execute( "SELECT Actor.*, Actor$Passenger.tier FROM Actor LEFT JOIN Actor$Passenger ON Actor$Passenger.id = Actor.id", [] );
+
+        rows.map( (row: any): void=>
+        {
+            if( row.role === Actor$Role.crew )
+                Actor$Crew.members.set( row.id, new Actor$Crew( row.id, row.name, row.email, row.salt, row.password ) );
+
+            else if( row.role === Actor$Role.passenger )
+                Actor$Passenger.members.set( row.id, new Actor$Passenger( row.id, row.name, row.email, row.salt, row.password, row.tier ) );
+
+            throw new Error( "Actor has invalid role" );
+        });
     }
-    public static async create( role: Actor$Role, name: string, email: string, password: string, tier?: Tier ): Promise<void>
+    public static async create( caller: Actor$Crew,role: Actor$Role, name: string, email: string, password: string, tier?: Tier ): Promise<Actor>
     {
-        // Will be implemented later.
+        if( !(caller instanceof Actor$Crew) )
+            throw new Library.Error( "Only crew members can create other actors", Library.Error.status.unauthorized );
+        
+        if( role === Actor$Role.crew && Actor$Crew.members.size === 3 )
+            throw new Library.Error( "Cannot create more than 3 crew members", Library.Error.status.internalError );
+
+        const normalizedEmail: string = email.toLowerCase().trim();
+    
+        if( !Library.EMAIL_REGEX.test( normalizedEmail ) )
+            throw new Library.Error( "Invalid email address", Library.Error.status.internalError );
+
+        if( role === Actor$Role.passenger )
+        {
+            if( !tier )
+                throw new Library.Error( "Passenger must have a tier", Library.Error.status.internalError );
+
+            const salt: string = randomBytes( 16 ).toString( "hex" );
+            const pass: string = Library.makeHash( password.trim(), salt );
+            const passengerAux: Actor$Passenger$Aux = { id: Library.getStringId(), role, name: name.trim(), email: normalizedEmail, tier: tier.level };
+
+            await Center.getMySqlClient().execute
+            (
+                "INSERT INTO Actor (id, role, name, email, salt, password) VALUES (?, ?, ?, ?, ?, ?)",
+                [passengerAux.id, passengerAux.role, passengerAux.name, normalizedEmail, salt, pass ]
+            );
+            await Center.getMySqlClient().execute
+            (
+                "INSERT INTO Actor$Passenger (id, tier) VALUES (?, ?)",
+                [passengerAux.id, passengerAux.tier]
+            );
+
+            Actor$Passenger.members.set( passengerAux.id, new Actor$Passenger( passengerAux.id, passengerAux.name, normalizedEmail, salt, pass, tier ) );
+        
+            return Actor$Passenger.members.get( passengerAux.id )!;
+        }
+        else if( role === Actor$Role.crew )
+        {
+            const salt: string = randomBytes( 16 ).toString( "hex" );
+            const pass: string = Library.makeHash( password.trim(), salt );
+            const crewAux: Actor$Aux = { id: Library.getStringId(), role, name: name.trim(), email: normalizedEmail };
+
+            await Center.getMySqlClient().execute
+            (
+                "INSERT INTO Actor (id, role, name, email, salt, password) VALUES (?, ?, ?, ?, ?, ?)",
+                [crewAux.id, crewAux.role, crewAux.name, normalizedEmail, salt, pass ]
+            );
+
+            Actor$Crew.members.set( crewAux.id, new Actor$Crew( crewAux.id, crewAux.name, normalizedEmail, salt, pass ) );
+        
+            return Actor$Crew.members.get( crewAux.id )!;
+        }
+
+        throw new Library.Error( "Invalid role", Library.Error.status.internalError );
     }
 
     public constructor( id: Library.Identifier, name: string, role: Actor$Role, email: string, salt: string, password: string )
@@ -70,6 +135,8 @@ export abstract class Actor
 }
 export class Actor$Passenger extends Actor
 {
+    public static readonly members: Map<Library.Identifier, Actor$Passenger> = new Map();
+
     private _tier: Tier;
 
     public constructor( id: Library.Identifier, name: string, email: string, salt: string, password: string, tier: Tier )
@@ -96,6 +163,8 @@ export class Actor$Passenger extends Actor
 }
 export class Actor$Crew extends Actor
 {
+    public static readonly members: Map<Library.Identifier, Actor$Crew> = new Map();
+
     public constructor( id: Library.Identifier, name: string, email: string, salt: string, password: string )
     {
         super( id, name, Actor$Role.crew, email, salt, password );

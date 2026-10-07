@@ -17,3 +17,4 @@
 ## Usage of AI Tools
 - Im using Codex as my coding agent tool.
 - I use Codex to implement test cases and add more edge cases to speed up development process.
+- I use Codex to verify whether my implementation has cover all of the requirements given and the edge cases.

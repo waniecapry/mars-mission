@@ -6,6 +6,8 @@ export namespace Library
     export type Identifier = string;
     export type UnixTime = number;
     export type Error$Aux = { message?: string; stack?: string; status?: number; };
+
+    export const EMAIL_REGEX: RegExp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     
     export function getStringId(): Identifier
     {
