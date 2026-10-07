@@ -18,10 +18,6 @@ export class Tier
 
     public static async initialise( client: Library.MySqlClient = Center.getMySqlClient() ): Promise<void>
     {
-        Tier.tiers.set( Tier$Level.Silver, new Tier( Tier$Level.Silver ) );
-        Tier.tiers.set( Tier$Level.Gold, new Tier( Tier$Level.Gold ) );
-        Tier.tiers.set( Tier$Level.Platinum, new Tier( Tier$Level.Platinum ) );
-    
         const [rows]: any = await client.execute
         (
             "SELECT id, type, status, name, description, minimumTier FROM Resource ORDER BY minimumTier, name, id",
@@ -31,6 +27,10 @@ export class Tier
         if( !Array.isArray( rows ) )
             throw new Library.Error( "Expected resource rows from the database", Library.Error.status.internalError );
 
+        Tier.tiers.set( Tier$Level.Silver, new Tier( Tier$Level.Silver ) );
+        Tier.tiers.set( Tier$Level.Gold, new Tier( Tier$Level.Gold ) );
+        Tier.tiers.set( Tier$Level.Platinum, new Tier( Tier$Level.Platinum ) );
+    
         const resources = (rows as Resource$Aux[]).map( row=>
         {
             const minimumTier: Tier | undefined = Tier.tiers.get( row.minimumTier as Tier$Level );
