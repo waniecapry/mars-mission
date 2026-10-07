@@ -89,6 +89,10 @@ export class Actor$Passenger extends Actor
             tier: this._tier.level
         };
     }
+    public hasPermission( resource: Resource ): boolean
+    {
+        return this._tier.canAccessResource( resource );
+    }
 }
 export class Actor$Crew extends Actor
 {
