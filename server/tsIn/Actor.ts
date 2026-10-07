@@ -29,19 +29,17 @@ export abstract class Actor
     public static async initialise(): Promise<void>
     {
         const [rows]: any = await Center.getMySqlClient().execute( "SELECT Actor.*, Actor$Passenger.tier FROM Actor LEFT JOIN Actor$Passenger ON Actor$Passenger.id = Actor.id", [] );
+        const crewMembers: Map<Library.Identifier, Actor$Crew> = new Map();
+        const passengerMembers: Map<Library.Identifier, Actor$Passenger> = new Map();
 
         rows.map( (row: Actor$AuxDb): void=>
         {
             if( row.role === Actor$Role.crew )
             {
-                if( Actor$Crew.members.size === 3 )
-                {
-                    Actor$Crew.members.clear();
-
+                if( crewMembers.size >= 3 )
                     throw new Library.Error( "Cannot have more than 3 crew members", Library.Error.status.internalError );
-                }
         
-                Actor$Crew.members.set( row.id, new Actor$Crew( row.id, row.name, row.email, row.salt, row.password ) );
+                crewMembers.set( row.id, new Actor$Crew( row.id, row.name, row.email, row.salt, row.password ) );
             }
             else if( row.role === Actor$Role.passenger )
             {
@@ -50,10 +48,19 @@ export abstract class Actor
                 if( !tier )
                     throw new Library.Error( "Passenger has invalid tier", Library.Error.status.internalError );
         
-                Actor$Passenger.members.set( row.id, new Actor$Passenger( row.id, row.name, row.email, row.salt, row.password, tier ) );
+                passengerMembers.set( row.id, new Actor$Passenger( row.id, row.name, row.email, row.salt, row.password, tier ) );
             }
             else throw new Library.Error( "Actor has invalid role", Library.Error.status.internalError );
         });
+
+        Actor$Crew.members.clear();
+        Actor$Passenger.members.clear();
+
+        for( const [id, member] of crewMembers )
+            Actor$Crew.members.set( id, member );
+
+        for( const [id, member] of passengerMembers )
+            Actor$Passenger.members.set( id, member );
     }
     public static async create( caller: Actor$Crew,role: Actor$Role, name: string, email: string, password: string, tier?: Tier ): Promise<Actor>
     {

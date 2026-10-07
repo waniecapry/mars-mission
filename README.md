@@ -5,6 +5,12 @@
 - Implement the Express part for server and REST Api.
 - Session in MySQL.
 
+## Server setup
+
+Run `npm install`, `npm test`, and `npm start` from the `server` directory. The server reads `server/data.env` and requires `DB_HOST`, `DB_USER`, `DB_NAME`, `PORT`, and `SESSION_SECRET`. `DB_PORT` defaults to 3306, and `DB_PASSWORD` defaults to an empty string.
+
+Sessions use the same MySQL settings unless `SESSION_STORE_HOST`, `SESSION_STORE_PORT`, `SESSION_STORE_DATABASE`, `SESSION_STORE_USER`, or `SESSION_STORE_PASS` are provided. Set `FRONT_END_ORIGIN` when the frontend runs on another origin and needs credentialed CORS requests.
+
 ## Project Extensions (Should implement when there's more time)
 - I was planning to use worker processes for the nodejs server. But seems like I may not need this now, maybe if this is a production project, i will make worker processes to handle incoming HTTP client or websocket client.
 - Instead of using REST API, I was actually planing to use SOcket.io broadcasting event. But maybe not now for this assesment.

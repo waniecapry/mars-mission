@@ -1,10 +1,10 @@
 const { describe, test } = require( "node:test" );
 const assert = require( "node:assert/strict" );
-const { Library } = require( "../../jsOut/Library" );
-const { Actor, Actor$Crew, Actor$Passenger, Actor$Role } = require( "../../jsOut/Actor" );
-const { Resource, Resource$Status } = require( "../../jsOut/Resource" );
-const { Tier, Tier$Level } = require( "../../jsOut/Tier" );
-const { Center } = require( "../../jsOut/Center" );
+const { Library } = require( "../jsOut/Library" );
+const { Actor, Actor$Crew, Actor$Passenger, Actor$Role } = require( "../jsOut/Actor" );
+const { Resource, Resource$Status } = require( "../jsOut/Resource" );
+const { Tier, Tier$Level } = require( "../jsOut/Tier" );
+const { Center } = require( "../jsOut/Center" );
 
 function resourceRow( id, minimumTier, status = Resource$Status.Active )
 {
@@ -145,6 +145,28 @@ describe( "Actor database loading", () =>
         useClient( t, clientReturning( [{ id: "p1", role: Actor$Role.passenger, name: "Mira", email: "mira@example.com", salt: "s", password: "h", tier: 4 }] ) );
 
         await assert.rejects( Actor.initialise(), /tier/i );
+    });
+    test( "Invalid actor rows leave previously loaded members unchanged", async t=>
+    {
+        Actor$Crew.members.clear();
+        Actor$Passenger.members.clear();
+        t.after( ()=>( Actor$Crew.members.clear(), Actor$Passenger.members.clear() ) );
+
+        const previous = crew( "previous" );
+
+        await Tier.initialise( {} );
+
+        useClient( t, clientReturning
+        ([
+            { id: "new-crew", role: Actor$Role.crew, name: "Bo", email: "bo@example.com", salt: "s", password: "h" },
+            { id: "bad-passenger", role: Actor$Role.passenger, name: "Mira", email: "mira@example.com", salt: "s", password: "h", tier: 4 }
+        ]) );
+
+        await assert.rejects( Actor.initialise(), isStatus( 500 ) );
+
+        assert.equal( Actor$Crew.members.get( "previous" ), previous );
+        assert.equal( Actor$Crew.members.has( "new-crew" ), false );
+        assert.equal( Actor$Passenger.members.size, 0 );
     });
 });
 
@@ -541,12 +563,17 @@ describe( "Resource loading and tier lists", () =>
     
         await loadTiers( t, rows );
     
+        const platinum = Tier.tiers.get( Tier$Level.Platinum );
+
+        assert.deepEqual( platinum.getResources().map( resource=>resource.id ), ["old"] );
+
         rows.splice( 0, rows.length, resourceRow( "new", Tier$Level.Platinum ) );
     
         await Resource.initialise();
 
         assert.equal( Resource.resourcesByMinimumTier.has( Tier$Level.Silver ), false );
         assert.deepEqual( [...Resource.resourcesByMinimumTier.get( Tier$Level.Platinum )].map( resource=>resource.id ), ["new"] );
+        assert.deepEqual( platinum.getResources().map( resource=>resource.id ), ["new"] );
     });
     test( "Given a valid load, when a later load has invalid data, then the valid tiers remain available", async t=>
     {

@@ -43,10 +43,32 @@ export namespace Center
         if( !host || !user || !database )
             throw new Library.Error( "DB_HOST, DB_USER, and DB_NAME must be configured" , Library.Error.status.internalError );
 
-        const port = Number( process.env.DB_PORT ?? 3306 );
+        const port: number = Number( process.env.DB_PORT ?? 3306 );
     
         if( !Number.isInteger( port ) || port < 1 || port > 65535 )
             throw new Library.Error( "DB_PORT must be a valid port" , Library.Error.status.internalError );
+
+        const serverPort: number = Number( process.env.PORT );
+
+        if( !Number.isInteger( serverPort ) || serverPort < 1 || serverPort > 65535 )
+            throw new Library.Error( "PORT must be a valid port", Library.Error.status.internalError );
+
+        const sessionSecret: string | undefined = process.env.SESSION_SECRET;
+
+        if( !sessionSecret?.trim() )
+            throw new Library.Error( "SESSION_SECRET must be configured", Library.Error.status.internalError );
+
+        const sessionStorePort: number = Number( process.env.SESSION_STORE_PORT || port );
+
+        if( !Number.isInteger( sessionStorePort ) || sessionStorePort < 1 || sessionStorePort > 65535 )
+            throw new Library.Error( "SESSION_STORE_PORT must be a valid port", Library.Error.status.internalError );
+
+        const options: HttpServer$Options =
+        {
+            port: serverPort,
+            sessionSecret,
+            frontEndOrigin: process.env.FRONT_END_ORIGIN
+        };
 
         const client: Library.MySqlClient = new Library.MySqlClient( host, user, process.env.DB_PASSWORD ?? "", database, port );
     
@@ -58,27 +80,20 @@ export namespace Center
         await Resource.initialise();
         await Actor.initialise();
 
-        const options: HttpServer$Options =
-        {
-            port: parseInt( process.env.PORT as string ),
-            sessionSecret: process.env.SESSION_SECRET as string,
-            frontEndOrigin: process.env.FRONT_END_ORIGIN as string
-        };
-    
         _server = new HttpServer
         (
             options,
-            process.env.SESSION_STORE_HOST as string,
-            parseInt( process.env.SESSION_STORE_PORT as string ),
-            process.env.SESSION_STORE_DATABASE as string,
-            process.env.SESSION_STORE_USER as string,
-            process.env.SESSION_STORE_PASS as string
+            process.env.SESSION_STORE_HOST || host,
+            sessionStorePort,
+            process.env.SESSION_STORE_DATABASE || database,
+            process.env.SESSION_STORE_USER || user,
+            process.env.SESSION_STORE_PASS ?? process.env.DB_PASSWORD ?? ""
         );
 
         await _server.initialise( options.sessionSecret, options.frontEndOrigin );
 
-        _server.app.use( async(req: Request, res: Response, next: NextFunction )=>
-        {                           console.log( "it come here,", req.session );
+        _server.app.use( (req: Request, res: Response, next: NextFunction)=>
+        {
             const path: string = req.path.toLowerCase();
             const isPrivateRoute: boolean = path === "/i" || path.startsWith( "/i/" ); // anything starts with i considered as private and need authorisation
 
@@ -97,7 +112,7 @@ export namespace Center
             next();
         });
         handleRequests( _server.app );
-        _server.start();
+        await _server.start();
     }
     export function getMySqlClient(): Library.MySqlClient
     {
@@ -114,7 +129,7 @@ export namespace Center
             for( const resource of resourceSet )
                 try{ resources.push( resource.toAux( caller ) ); }
                 catch( ex )
-                {                                   console.error( ex );
+                {
                     if( (ex as Library.Error).status === Library.Error.status.unauthorized )
                     {
                         // Ignore resources the caller is not authorized to access
@@ -139,7 +154,7 @@ export namespace Center
     {
         port: number;
         sessionSecret: string;
-        frontEndOrigin: string;
+        frontEndOrigin?: string;
     }
 
     export class HttpServer
@@ -160,18 +175,26 @@ export namespace Center
         {
             return this._app;
         }
-        public start(): void 
+        public start(): Promise<void>
         {
             if( !this._initialised )
                 throw new Error( "HTTP server has not been initialised" );
 
             this.initEnd();
-            this._app.listen( this._port, () => 
+
+            return new Promise( (resolve, reject)=>
             {
-                console.log( `Server listening on port ${this._port}` );
+                const server: any = this._app.listen( this._port );
+
+                server.once( "listening", () =>
+                {
+                    console.log( `Server listening on port ${this._port}` );
+                    resolve();
+                });
+                server.once( "error", reject );
             });
         }
-        public async initialise( sessionSecret: string, frontEndOrigin: string ): Promise<void>
+        public async initialise( sessionSecret: string, frontEndOrigin?: string ): Promise<void>
         {
             if( this._initialised )
                 return;
@@ -193,14 +216,10 @@ export namespace Center
             });
     
             this._app.disable( "x-powered-by" );
-            this._app.use
-            (
-                cors
-                ({
-                    origin: frontEndOrigin,
-                    credentials: true
-                })
-            );
+    
+            if( frontEndOrigin )
+                this._app.use( cors( { origin: frontEndOrigin, credentials: true } ) );
+
             this._app.use( helmet() );
             this._app.use( express.json( { limit: "10mb" } ) );
             this._app.use( express.urlencoded( { extended: true, limit: "10mb" } ) );
@@ -297,6 +316,30 @@ export namespace Center
                         cb( error as Error );
         
                     else console.error( "Unable to save session", error );
+                }
+            })();
+        }
+        public override touch( sid: string, data: session.SessionData, cb?: ( err?: Error | null ) => void ): void
+        {
+            void (async ()=>
+            {
+                try
+                {
+                    const expiresAt: Library.UnixTime = data.cookie.expires?.getTime() ?? Date.now() + (data.cookie.maxAge ?? 60 * 60 * 1000);
+
+                    await this._mysqlClient.execute
+                    (
+                        "UPDATE `Session` SET expiresAt = ? WHERE id = ?",
+                        [expiresAt, sid]
+                    );
+                    cb?.( null );
+                }
+                catch( error )
+                {
+                    if( cb )
+                        cb( error as Error );
+
+                    else console.error( "Unable to refresh session", error );
                 }
             })();
         }
