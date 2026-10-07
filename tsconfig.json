@@ -20,7 +20,7 @@
         "noUnusedLocals": false,                           /* Enable error reporting when local variables aren't read. */
         "noUnusedParameters": false,                       /* Raise an error when a function parameter isn't read. */
         "outDir": "./jsOut",                               /* Specify an output folder for all emitted files. */
-        "rootDir": "../tsIn",                               /* Specify the root folder within your source files. */
+        "rootDir": "./tsIn",                               /* Specify the root folder within your source files. */
         "skipLibCheck": true,
         "strict": true,                                    /* Enable all strict type-checking options. */
         "strictFunctionTypes": true,
@@ -30,6 +30,6 @@
     },
     "include":
     [
-        "../tsIn"
+        "./tsIn"
     ]
 }
