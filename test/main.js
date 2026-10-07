@@ -23,7 +23,9 @@ function clientReturning( rows, calls = [] )
 function crew( id="crew-1" )
 {
     const member = new Actor$Crew( id, "Ari", "ari@example.com", "salt", "hash" );
+    
     Actor$Crew.members.set( id, member );
+
     return member;
 }
 function isStatus( status )
@@ -33,7 +35,9 @@ function isStatus( status )
 function useClient( t, client )
 {
     const original = Center.getMySqlClient;
+
     Center.getMySqlClient = ()=>client;
+
     t.after( ()=>{ Center.getMySqlClient = original; } );
 }
 async function loadTiers( t, rows, calls = [] )
@@ -103,10 +107,15 @@ describe( "Actor database loading", () =>
     {
         Actor$Passenger.members.clear();
         t.after( ()=>Actor$Passenger.members.clear() );
+    
         await Tier.initialise( {} );
+    
         useClient( t, clientReturning( [{ id: "p1", role: Actor$Role.passenger, name: "Mira", email: "mira@example.com", salt: "s", password: "h", tier: Tier$Level.Gold }] ) );
+        
         await Actor.initialise();
+    
         const loaded = Actor$Passenger.members.get( "p1" );
+
         assert.equal( loaded.toAux().tier, Tier$Level.Gold );
         assert.equal( loaded.hasPermission( new Resource( "r1", 1, Resource$Status.Active, "Food", "", Tier.tiers.get( Tier$Level.Silver ) ) ), true );
     });
@@ -119,7 +128,9 @@ describe( "Actor database loading", () =>
     {
         Actor$Crew.members.clear();
         t.after( ()=>Actor$Crew.members.clear() );
+    
         const rows = [1, 2, 3, 4].map( id=>({ id: `c${id}`, role: Actor$Role.crew, name: "Crew", email: `c${id}@example.com`, salt: "s", password: "h" }) );
+
         useClient( t, clientReturning( rows ) );
         await assert.rejects( Actor.initialise(), isStatus( 500 ) );
         assert.equal( Actor$Crew.members.size, 0, "Invalid database rows must not partially load the crew map" );
@@ -128,8 +139,11 @@ describe( "Actor database loading", () =>
     {
         Actor$Passenger.members.clear();
         t.after( ()=>Actor$Passenger.members.clear() );
+    
         await Tier.initialise( {} );
+    
         useClient( t, clientReturning( [{ id: "p1", role: Actor$Role.passenger, name: "Mira", email: "mira@example.com", salt: "s", password: "h", tier: 4 }] ) );
+
         await assert.rejects( Actor.initialise(), /tier/i );
     });
 });
@@ -139,9 +153,13 @@ describe( "Actor creation", () =>
     test( "Crew creation saves a normalized account and a password hash", async t=>
     {
         Actor$Crew.members.clear();
+    
         const calls = [];
+    
         useClient( t, clientReturning( [], calls ) );
+    
         const created = await Actor.create( crew(), Actor$Role.crew, "  Bo  ", "  BO@EXAMPLE.COM  ", " launch " );
+
         assert.equal( created.name, "Bo" );
         assert.equal( created.email, "bo@example.com" );
         assert.equal( Actor$Crew.members.get( created.id ), created );
@@ -157,15 +175,20 @@ describe( "Actor creation", () =>
     {
         Actor$Crew.members.clear();
         Actor$Passenger.members.clear();
+    
         const calls = [];
+    
         let transactions = 0;
+    
         useClient( t, { withTransaction: async work=>
         {
             ++transactions;
             await work( { execute: async ( query, values )=>{ calls.push( { query, values } ); } } );
         } } );
+    
         const gold = new Tier( Tier$Level.Gold );
         const created = await Actor.create( crew(), Actor$Role.passenger, " Mira ", " MIRA@EXAMPLE.COM ", "pass", gold );
+
         assert.equal( transactions, 1 );
         assert.equal( calls.length, 2 );
         assert.match( calls[0].query, /INSERT INTO Actor \(/ );
@@ -178,20 +201,29 @@ describe( "Actor creation", () =>
     test( "Passenger caller cannot create another actor", async t=>
     {
         const calls = [];
+
         useClient( t, clientReturning( [], calls ) );
+
         const caller = new Actor$Passenger( "p1", "Mira", "mira@example.com", "s", "h", new Tier( Tier$Level.Silver ) );
+
         await assert.rejects( Actor.create( caller, Actor$Role.crew, "Bo", "bo@example.com", "pass" ), isStatus( 401 ) );
         assert.equal( calls.length, 0 );
     });
     test( "A fourth crew member is rejected", async t=>
     {
         Actor$Crew.members.clear();
+    
         const calls = [];
+    
         useClient( t, clientReturning( [], calls ) );
+    
         const caller = crew();
+    
         crew( "crew-2" );
         crew( "crew-3" );
+    
         await assert.rejects( Actor.create( caller, Actor$Role.crew, "Bo", "bo@example.com", "pass" ), isStatus( 500 ) );
+
         assert.equal( calls.length, 0 );
         t.after( ()=>Actor$Crew.members.clear() );
     });
@@ -217,12 +249,17 @@ describe( "Actor creation", () =>
     test( "Invalid email, missing passenger tier, and invalid role write nothing", async t=>
     {
         Actor$Crew.members.clear();
+    
         const calls = [];
+    
         useClient( t, clientReturning( [], calls ) );
+    
         const caller = crew();
+    
         await assert.rejects( Actor.create( caller, Actor$Role.crew, "Bo", "bad-email", "pass" ), isStatus( 500 ) );
         await assert.rejects( Actor.create( caller, Actor$Role.passenger, "Bo", "bo@example.com", "pass" ), isStatus( 500 ) );
         await assert.rejects( Actor.create( caller, 9, "Bo", "bo@example.com", "pass" ), isStatus( 500 ) );
+
         assert.equal( calls.length, 0 );
         t.after( ()=>Actor$Crew.members.clear() );
     });
@@ -230,27 +267,40 @@ describe( "Actor creation", () =>
     {
         Actor$Crew.members.clear();
         t.after( ()=>Actor$Crew.members.clear() );
+    
         const failure = new Error( "duplicate email" );
+    
         useClient( t, { execute: async ()=>{ throw failure; } } );
+    
         const caller = crew();
+    
         crew( "crew-2" );
+    
         await assert.rejects( Actor.create( caller, Actor$Role.crew, "Bo", "bo@example.com", "pass" ), error=>error === failure );
+    
         assert.equal( Actor$Crew.members.size, 2 );
         Center.getMySqlClient = ()=>clientReturning( [] );
+    
         await Actor.create( caller, Actor$Role.crew, "Cy", "cy@example.com", "pass" );
+
         assert.equal( Actor$Crew.members.size, 3, "A failed insert must free the third crew slot" );
     });
     test( "Failed passenger transaction does not update the member map", async t=>
     {
         Actor$Crew.members.clear();
         Actor$Passenger.members.clear();
+    
         const failure = new Error( "passenger insert failed" );
+    
         let inserts = 0;
+    
         useClient( t, { withTransaction: async work=>work( { execute: async ()=>
         {
             if( ++inserts === 2 ) throw failure;
         } } ) } );
+    
         await assert.rejects( Actor.create( crew(), Actor$Role.passenger, "Bo", "bo@example.com", "pass", new Tier( Tier$Level.Silver ) ), error=>error === failure );
+
         assert.equal( inserts, 2 );
         assert.equal( Actor$Passenger.members.size, 0 );
         t.after( ()=>( Actor$Crew.members.clear(), Actor$Passenger.members.clear() ) );
@@ -275,13 +325,15 @@ describe( "Actors", () =>
     });
     test( "Given a passenger, when read, then its tier appears as a level", ()=>
     {
-        const passenger = new Actor$Passenger(
+        const passenger = new Actor$Passenger
+        (
             "passenger-1", "Mira", "mira@example.com", "salt", "hash", new Tier( Tier$Level.Gold )
         );
 
         assert.equal( passenger.role, Actor$Role.passenger );
         assert.equal( passenger.tier.level, Tier$Level.Gold );
-        assert.deepEqual( passenger.toAux(), {
+        assert.deepEqual( passenger.toAux(), 
+        {
             id: "passenger-1", role: Actor$Role.passenger, name: "Mira",
             email: "mira@example.com", tier: Tier$Level.Gold
         });
@@ -290,7 +342,8 @@ describe( "Actors", () =>
     test( "Given a stored hash, when a crew member checks passwords, then a wrong one fails", ()=>
     {
         const salt = "crew-salt";
-        const crew = new Actor$Crew(
+        const crew = new Actor$Crew
+        (
             "crew-2", "Bo", "bo@example.com", salt, Library.makeHash( "launch", salt )
         );
 
@@ -317,8 +370,11 @@ describe( "Actors", () =>
         const member = new Actor$Passenger( "p1", "Mira", "mira@example.com", "s", "h", new Tier( Tier$Level.Silver ) );
         const gold = new Tier( Tier$Level.Gold );
         const calls = [];
+    
         useClient( t, clientReturning( [], calls ) );
+    
         await member.setTier( new Actor$Crew( "c1", "Ari", "ari@example.com", "s", "h" ), gold );
+
         assert.equal( calls.length, 1 );
         assert.match( calls[0].query, /UPDATE Actor\$Passenger SET tier/ );
         assert.deepEqual( calls[0].values, [Tier$Level.Gold, "p1"] );
@@ -329,15 +385,20 @@ describe( "Actors", () =>
     {
         const member = new Actor$Passenger( "p1", "Mira", "mira@example.com", "s", "h", new Tier( Tier$Level.Silver ) );
         const failure = new Error( "database unavailable" );
+        
         useClient( t, { execute: async ()=>{ throw failure; } } );
+    
         await assert.rejects( member.setTier( new Actor$Crew( "c1", "Ari", "ari@example.com", "s", "h" ), new Tier( Tier$Level.Gold ) ), error=>error === failure );
+    
         assert.equal( member.tier.level, Tier$Level.Silver );
     });
     test( "Passengers cannot change another passenger tier", async ()=>
     {
         const member = new Actor$Passenger( "p1", "Mira", "mira@example.com", "s", "h", new Tier( Tier$Level.Silver ) );
         const caller = new Actor$Passenger( "p2", "Bo", "bo@example.com", "s", "h", new Tier( Tier$Level.Gold ) );
+        
         await assert.rejects( member.setTier( caller, new Tier( Tier$Level.Gold ) ), isStatus( 401 ) );
+
         assert.equal( member.tier.level, Tier$Level.Silver );
     });
 });
@@ -379,6 +440,7 @@ describe( "Resource loading and tier lists", () =>
     test( "Given zero database rows, when loaded, then all three tiers have no resources", async t=>
     {
         const calls = [];
+    
         await loadTiers( t, [], calls );
 
         assert.equal( calls.length, 1, "Loading tiers should issue one resource query" );
@@ -429,6 +491,7 @@ describe( "Resource loading and tier lists", () =>
         test( `Given invalid minimumTier ${level}, when loaded, then a server data error is raised`, async t=>
         {
             useClient( t, clientReturning( [resourceRow( "invalid-tier", level )] ) );
+            
             await Tier.initialise();
             await assert.rejects
             (
@@ -440,6 +503,7 @@ describe( "Resource loading and tier lists", () =>
     test( "Given an invalid resource status, when loaded, then a server data error is raised", async t=>
     {
         useClient( t, clientReturning( [resourceRow( "invalid-status", Tier$Level.Silver, 9 )] ) );
+        
         await Tier.initialise();
         await assert.rejects
         (
@@ -450,6 +514,7 @@ describe( "Resource loading and tier lists", () =>
     test( "Given a non-row query result, when loaded, then a server data error is raised", async t=>
     {
         useClient( t, clientReturning( { unexpected: "result" } ) );
+        
         await Tier.initialise();
         await assert.rejects
         (
@@ -460,9 +525,10 @@ describe( "Resource loading and tier lists", () =>
     test( "Given a database query failure, when loaded, then the failure is propagated", async t=>
     {
         const databaseError = new Error( "database unavailable" );
+
         useClient( t, { execute: async ()=>{ throw databaseError; } } );
-        await Tier.initialise();
     
+        await Tier.initialise();
         await assert.rejects
         (
             Resource.initialise(),
@@ -472,8 +538,11 @@ describe( "Resource loading and tier lists", () =>
     test( "Given new database rows, when reloaded, then the tier lists are refreshed", async t=>
     {
         const rows = [resourceRow( "old", Tier$Level.Silver )];
+    
         await loadTiers( t, rows );
+    
         rows.splice( 0, rows.length, resourceRow( "new", Tier$Level.Platinum ) );
+    
         await Resource.initialise();
 
         assert.equal( Resource.resourcesByMinimumTier.has( Tier$Level.Silver ), false );
@@ -482,7 +551,9 @@ describe( "Resource loading and tier lists", () =>
     test( "Given a valid load, when a later load has invalid data, then the valid tiers remain available", async t=>
     {
         const rows = [resourceRow( "working", Tier$Level.Gold )];
+    
         await loadTiers( t, rows );
+    
         rows.splice( 0, rows.length, resourceRow( "invalid", Tier$Level.Silver, 9 ) );
 
         await assert.rejects
@@ -490,6 +561,7 @@ describe( "Resource loading and tier lists", () =>
             Resource.initialise(),
             error=>error instanceof Library.Error && error.status === 500
         );
+
         assert.deepEqual
         (
             [...Resource.resourcesByMinimumTier.get( Tier$Level.Gold )].map( resource=>resource.id ), ["working"],
@@ -504,20 +576,26 @@ describe( "Resource permissions and passenger discovery", () =>
     {
         const resource = new Resource( "g1", 1, Resource$Status.Active, "Cabin", "", new Tier( Tier$Level.Gold ) );
         const caller = new Actor$Passenger( "p1", "Mira", "mira@example.com", "s", "h", new Tier( Tier$Level.Silver ) );
+    
         assert.throws( ()=>resource.toAux( caller ), isStatus( 401 ) );
     });
     test( "Center filters resources for Silver, Gold, Platinum and crew", async t=>
     {
         await loadTiers( t, [resourceRow( "s1", 1 ), resourceRow( "g1", 2 ), resourceRow( "p1", 3 )] );
+    
         const originalLog = console.error;
+    
         console.error = ()=>{};
+    
         t.after( ()=>{ console.error = originalLog; } );
 
         for( const [level, expected] of [[1, ["s1"]], [2, ["s1", "g1"]], [3, ["s1", "g1", "p1"]]] )
         {
             const caller = new Actor$Passenger( `p${level}`, "Mira", "mira@example.com", "s", "h", new Tier( level ) );
+        
             assert.deepEqual( Center.toAux( caller ).resources.map( item=>item.id ), expected );
         }
+    
         assert.deepEqual( Center.toAux( new Actor$Crew( "c1", "Ari", "ari@example.com", "s", "h" ) ).resources.map( item=>item.id ), ["s1", "g1", "p1"] );
     });
 });
