@@ -5,7 +5,9 @@ import type { Resource } from "./Resource";
 import { Tier, Tier$Level } from "./Tier";
 
 export type Actor$Aux = { id: Library.Identifier, role: Actor$Role, name: string, email: string };
+export type Actor$AuxDb = Actor$Aux & { salt: string, password: string };
 export type Actor$Passenger$Aux = Actor$Aux & { tier: Tier$Level };
+export type Actor$Passenger$AuxDb = Actor$AuxDb & { tier: Tier$Level };
 
 export enum Actor$Role
 {
@@ -26,15 +28,29 @@ export abstract class Actor
     {
         const [rows]: any = await Center.getMySqlClient().execute( "SELECT Actor.*, Actor$Passenger.tier FROM Actor LEFT JOIN Actor$Passenger ON Actor$Passenger.id = Actor.id", [] );
 
-        rows.map( (row: any): void=>
+        rows.map( (row: Actor$AuxDb): void=>
         {
             if( row.role === Actor$Role.crew )
+            {
+                if( Actor$Crew.members.size === 3 )
+                {
+                    Actor$Crew.members.clear();
+
+                    throw new Library.Error( "Cannot have more than 3 crew members", Library.Error.status.internalError );
+                }
+        
                 Actor$Crew.members.set( row.id, new Actor$Crew( row.id, row.name, row.email, row.salt, row.password ) );
-
+            }
             else if( row.role === Actor$Role.passenger )
-                Actor$Passenger.members.set( row.id, new Actor$Passenger( row.id, row.name, row.email, row.salt, row.password, row.tier ) );
-
-            else throw new Error( "Actor has invalid role" );
+            {
+                const tier: Tier | undefined = Tier.tiers.get( (row as Actor$Passenger$AuxDb).tier );
+            
+                if( !tier )
+                    throw new Library.Error( "Passenger has invalid tier", Library.Error.status.internalError );
+        
+                Actor$Passenger.members.set( row.id, new Actor$Passenger( row.id, row.name, row.email, row.salt, row.password, tier ) );
+            }
+            else throw new Library.Error( "Actor has invalid role", Library.Error.status.internalError );
         });
     }
     public static async create( caller: Actor$Crew,role: Actor$Role, name: string, email: string, password: string, tier?: Tier ): Promise<Actor>

@@ -14,7 +14,7 @@ export class Tier
     public static readonly tiers: Map<Tier$Level, Tier> = new Map();
 
     private _level: Tier$Level;
-    private _resources: Resource[];
+    private _resources: Resource[] = [];
 
     public static async initialise( client: Library.MySqlClient = Center.getMySqlClient() ): Promise<void>
     {

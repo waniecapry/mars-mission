@@ -121,8 +121,8 @@ describe( "Actor database loading", () =>
         t.after( ()=>Actor$Crew.members.clear() );
         const rows = [1, 2, 3, 4].map( id=>({ id: `c${id}`, role: Actor$Role.crew, name: "Crew", email: `c${id}@example.com`, salt: "s", password: "h" }) );
         useClient( t, clientReturning( rows ) );
-        await Actor.initialise();
-        assert.ok( Actor$Crew.members.size <= 3, "Loaded crew count must not exceed three" );
+        await assert.rejects( Actor.initialise(), isStatus( 500 ) );
+        assert.equal( Actor$Crew.members.size, 0, "Invalid database rows must not partially load the crew map" );
     });
     test( "Loading rejects an unknown passenger tier", async t=>
     {
@@ -224,12 +224,16 @@ describe( "Actor creation", () =>
     test( "Failed crew insert does not update the member map", async t=>
     {
         Actor$Crew.members.clear();
+        t.after( ()=>Actor$Crew.members.clear() );
         const failure = new Error( "duplicate email" );
         useClient( t, { execute: async ()=>{ throw failure; } } );
         const caller = crew();
+        crew( "crew-2" );
         await assert.rejects( Actor.create( caller, Actor$Role.crew, "Bo", "bo@example.com", "pass" ), error=>error === failure );
-        assert.equal( Actor$Crew.members.size, 1 );
-        t.after( ()=>Actor$Crew.members.clear() );
+        assert.equal( Actor$Crew.members.size, 2 );
+        Center.getMySqlClient = ()=>clientReturning( [] );
+        await Actor.create( caller, Actor$Role.crew, "Cy", "cy@example.com", "pass" );
+        assert.equal( Actor$Crew.members.size, 3, "A failed insert must free the third crew slot" );
     });
     test( "Failed passenger transaction does not update the member map", async t=>
     {
