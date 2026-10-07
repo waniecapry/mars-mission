@@ -14,7 +14,7 @@ export class Tier
     public static readonly tiers: Map<Tier$Level, Tier> = new Map();
 
     private _level: Tier$Level;
-    private _resources: Resource[] = [];
+    // private _resources: Resource[] = [];
 
     public static async initialise( client: Library.MySqlClient = Center.getMySqlClient() ): Promise<void>
     {
@@ -33,18 +33,22 @@ export class Tier
     }
     public getResources(): Resource[]
     {
-        if( this._resources.length > 0 )
-            return this._resources;
+        // if( this._resources.length > 0 )
+        //     return this._resources;
+
+        const resources: Resource[] = [];
 
         for( let i = Tier$Level.Silver; i <= this.level; ++i )
         {
             const tierResources: Set<Resource> | undefined = Resource.resourcesByMinimumTier.get( i );
     
             if( tierResources )
-                this._resources.push( ...tierResources );
+                resources.push( ...tierResources );
+                // this._resources.push( ...tierResources );
         }
 
-        return this._resources;
+        // return this._resources;
+        return resources;
     }
     public canAccessResource( resource: Resource ): boolean
     {
