@@ -39,4 +39,29 @@ CREATE TABLE Actor$Passenger
     FOREIGN KEY(id) REFERENCES Actor(id)
 ) DEFAULT CHARACTER SET = utf8;
 
+CREATE TABLE Actor$Passenger$TierChange
+(
+    id VARCHAR(36) NOT NULL,
+    passengerId VARCHAR(36) NOT NULL,
+    oldTier TINYINT NOT NULL,
+    newTier TINYINT NOT NULL,
+    changedAt BIGINT UNSIGNED NOT NULL,
+    changeBy VARCHAR(36) NOT NULL,
+    reason VARCHAR(200) NOT NULL,
+    PRIMARY KEY(id),
+    FOREIGN KEY(passengerId) REFERENCES Actor$Passenger(id),
+    FOREIGN KEY(changeBy) REFERENCES Actor(id)
+) DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE Resource
+(
+    id VARCHAR(36) NOT NULL,
+    type TINYINT NOT NULL,
+    status TINYINT NOT NULL,
+    name VARCHAR(30) NOT NULL,
+    description VARCHAR(200) NOT NULL,
+    minimumTier TINYINT NOT NULL,
+    PRIMARY KEY(id)
+) DEFAULT CHARACTER SET = utf8;
+
 INSERT INTO Configuration(indexingKey, val) VALUES('dbVersion', "1");
