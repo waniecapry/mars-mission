@@ -13,3 +13,7 @@
 - Add the ability to delete passengers and resources.
 - Allow inactive crew members to be replaced while keeping the crew size at three or fewer.
 - Resource inventory management.
+
+## Usage of AI Tools
+- Im using Codex as my coding agent tool.
+- I use Codex to implement test cases and add more edge cases to speed up development process.
