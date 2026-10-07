@@ -1,6 +1,7 @@
 import { Library } from "./Library";
 import { Center } from "./Center";
 import { Tier, Tier$Level } from "./Tier";
+import { Actor } from "./Actor";
 
 export type Resource$Aux = 
 { 
@@ -90,8 +91,11 @@ export class Resource
     {
         return this._minimumTier;
     }
-    public toAux(): Resource$Aux
+    public toAux( caller: Actor ): Resource$Aux
     {
+        if( !caller.hasPermission( this ) )
+            throw new Library.Error( "Caller does not have permission to access this resource", Library.Error.status.unauthorized );
+
         return { 
             id: this._id, 
             type: this._type, 

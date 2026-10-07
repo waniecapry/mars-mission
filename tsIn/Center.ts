@@ -1,12 +1,19 @@
 import { resolve } from "node:path";
 import dotenv from "dotenv";
 import { Library } from "./Library";
-import { Actor } from "./Actor";
+import { Actor, Actor$Aux, Actor$Passenger$Aux } from "./Actor";
 import { Tier } from "./Tier";
-import { Resource } from "./Resource";
+import { Resource, Resource$Aux } from "./Resource";
 
 export namespace Center
 {
+    export type Aux = // Things to be returned to end user/client
+    {
+        actor: Actor$Aux;
+        resources: Resource$Aux[];
+        passengers?: Actor$Passenger$Aux[];
+    };
+
     let _mysqlClient: Library.MySqlClient | null = null;
 
     export async function initialise(): Promise<void>
@@ -41,5 +48,29 @@ export namespace Center
             throw new Library.Error( "MySQL client has not been initialised" , Library.Error.status.internalError );
 
         return _mysqlClient;
+    }
+    export function toAux( caller: Actor ): Aux
+    {
+        const resources: Resource$Aux[] = [];
+        
+        for( const resourceSet of Resource.resourcesByMinimumTier.values() )
+            for( const resource of resourceSet )
+                try{ resources.push( resource.toAux( caller ) ); }
+                catch( ex )
+                {                                   console.error( ex );
+                    if( (ex as Library.Error).status === Library.Error.status.unauthorized )
+                    {
+                        // Ignore resources the caller is not authorized to access
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
+                }
+
+        return {
+            actor: caller.toAux(),
+            resources: resources
+        };
     }
 }

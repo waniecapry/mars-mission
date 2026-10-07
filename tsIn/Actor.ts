@@ -122,6 +122,7 @@ export abstract class Actor
     {
         return this._email;
     }
+    public abstract hasPermission( resource: Resource ): boolean;
     public isValidPassword( password: string ): boolean
     {
         return Library.isHashValueCorrect( password, this._salt, this._password );
@@ -159,7 +160,7 @@ export class Actor$Passenger extends Actor
             tier: this._tier.level
         };
     }
-    public hasPermission( resource: Resource ): boolean
+    public override hasPermission( resource: Resource ): boolean
     {
         return this._tier.canAccessResource( resource );
     }
@@ -171,5 +172,9 @@ export class Actor$Crew extends Actor
     public constructor( id: Library.Identifier, name: string, email: string, salt: string, password: string )
     {
         super( id, name, Actor$Role.crew, email, salt, password );
+    }
+    public override hasPermission( resource: Resource ): boolean
+    {
+        return true;
     }
 }
