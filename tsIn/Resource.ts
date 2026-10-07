@@ -1,5 +1,6 @@
-import type { Library } from "./Library";
-import type { Tier, Tier$Level } from "./Tier";
+import { Library } from "./Library";
+import { Center } from "./Center";
+import { Tier, Tier$Level } from "./Tier";
 
 export type Resource$Aux = 
 { 
@@ -19,6 +20,36 @@ export enum Resource$Status
 
 export class Resource
 {
+    public static readonly resourcesByMinimumTier: Map<Tier$Level, Set<Resource>> = new Map();
+
+    public static async initialise(): Promise<void>
+    {
+        const [rows]: any = await Center.getMySqlClient().execute
+        (
+            "SELECT id, type, status, name, description, minimumTier FROM Resource ORDER BY minimumTier, name, id",
+            []
+        );
+
+        if( !Array.isArray( rows ) )
+            throw new Library.Error( "Expected resource rows from the database", Library.Error.status.internalError );
+
+        (rows as Resource$Aux[]).map( row=>
+        {
+            const minimumTier: Tier | undefined = Tier.tiers.get( row.minimumTier as Tier$Level );
+    
+            if( !minimumTier )
+                throw new Library.Error( `Unexpected resource tier: ${row.minimumTier}`, Library.Error.status.internalError );
+
+            if( row.status !== Resource$Status.Inactive && row.status !== Resource$Status.Active )
+                throw new Library.Error( `Invalid resource status: ${row.status}`, Library.Error.status.internalError );
+
+            if( !Resource.resourcesByMinimumTier.has( minimumTier.level ) )
+                Resource.resourcesByMinimumTier.set( minimumTier.level, new Set() );
+
+            Resource.resourcesByMinimumTier.get( minimumTier.level )!.add( new Resource( row.id, row.type, row.status, row.name, row.description, minimumTier ) );
+        });
+    }
+
     private _id: Library.Identifier;
     private _type: number;
     private _status: Resource$Status;

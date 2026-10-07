@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { Library } from "./Library";
 import { Actor } from "./Actor";
 import { Tier } from "./Tier";
+import { Resource } from "./Resource";
 
 export namespace Center
 {
@@ -31,6 +32,7 @@ export namespace Center
         _mysqlClient = client;
 
         await Tier.initialise();
+        await Resource.initialise();
         await Actor.initialise();
     }
     export function getMySqlClient(): Library.MySqlClient
