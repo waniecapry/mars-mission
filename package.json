@@ -4,7 +4,7 @@
     "description": "",
     "scripts": {
         "build": "tsc",
-        "test": "npm run build && node --test test/*.test.js",
+        "test": "npm run build && node --test test/*.js",
         "start": "npm run build && node jsOut/index.js"
     },
     "dependencies": {

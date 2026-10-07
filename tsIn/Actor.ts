@@ -1,7 +1,9 @@
 import { Library } from "./Library";
+import type { Resource } from "./Resource";
+import type { Tier, Tier$Level } from "./Tier";
 
 export type Actor$Aux = { id: Library.Identifier, role: Actor$Role, name: string, email: string };
-export type Actor$Passenger$Aux = Actor$Aux & { tier: number };
+export type Actor$Passenger$Aux = Actor$Aux & { tier: Tier$Level };
 
 export enum Actor$Role
 {
@@ -22,7 +24,7 @@ export abstract class Actor
     {
         // No initialisation required for now.
     }
-    public static async create( role: Actor$Role, name: string, email: string, password: string, tier?: number ): Promise<void>
+    public static async create( role: Actor$Role, name: string, email: string, password: string, tier?: Tier ): Promise<void>
     {
         // Will be implemented later.
     }
@@ -68,15 +70,15 @@ export abstract class Actor
 }
 export class Actor$Passenger extends Actor
 {
-    private _tier: number; // Will make a class for the tier instead.
+    private _tier: Tier;
 
-    public constructor( id: Library.Identifier, name: string, email: string, salt: string, password: string, tier: number )
+    public constructor( id: Library.Identifier, name: string, email: string, salt: string, password: string, tier: Tier )
     {
         super( id, name, Actor$Role.passenger, email, salt, password );
 
         this._tier = tier;
     }
-    public get tier(): number
+    public get tier(): Tier
     {
         return this._tier;
     }
@@ -84,7 +86,7 @@ export class Actor$Passenger extends Actor
     {
         return { 
             ...super.toAux(),
-            tier: this._tier
+            tier: this._tier.level
         };
     }
 }
