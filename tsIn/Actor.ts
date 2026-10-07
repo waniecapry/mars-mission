@@ -2,7 +2,7 @@ import { randomBytes } from "crypto";
 import { Library } from "./Library";
 import { Center } from "./Center";
 import type { Resource } from "./Resource";
-import type { Tier, Tier$Level } from "./Tier";
+import { Tier, Tier$Level } from "./Tier";
 
 export type Actor$Aux = { id: Library.Identifier, role: Actor$Role, name: string, email: string };
 export type Actor$Passenger$Aux = Actor$Aux & { tier: Tier$Level };
@@ -42,9 +42,6 @@ export abstract class Actor
         if( !(caller instanceof Actor$Crew) )
             throw new Library.Error( "Only crew members can create other actors", Library.Error.status.unauthorized );
         
-        if( role === Actor$Role.crew && Actor$Crew.members.size === 3 )
-            throw new Library.Error( "Cannot create more than 3 crew members", Library.Error.status.internalError );
-
         const normalizedEmail: string = email.toLowerCase().trim();
     
         if( !Library.EMAIL_REGEX.test( normalizedEmail ) )
@@ -78,7 +75,10 @@ export abstract class Actor
             return Actor$Passenger.members.get( passengerAux.id )!;
         }
         else if( role === Actor$Role.crew )
-        {
+        {        
+            if( Actor$Crew.members.size === 3 )
+                throw new Library.Error( "Cannot create more than 3 crew members", Library.Error.status.internalError );
+
             const salt: string = randomBytes( 16 ).toString( "hex" );
             const pass: string = Library.makeHash( password.trim(), salt );
             const crewAux: Actor$Aux = { id: Library.getStringId(), role, name: name.trim(), email: normalizedEmail };
@@ -90,7 +90,7 @@ export abstract class Actor
             );
 
             Actor$Crew.members.set( crewAux.id, new Actor$Crew( crewAux.id, crewAux.name, normalizedEmail, salt, pass ) );
-        
+
             return Actor$Crew.members.get( crewAux.id )!;
         }
 

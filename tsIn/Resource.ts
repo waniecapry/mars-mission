@@ -34,6 +34,8 @@ export class Resource
         if( !Array.isArray( rows ) )
             throw new Library.Error( "Expected resource rows from the database", Library.Error.status.internalError );
 
+        const resourcesByMinimumTier: Map<Tier$Level, Set<Resource>> = new Map();
+
         (rows as Resource$Aux[]).map( row=>
         {
             const minimumTier: Tier | undefined = Tier.tiers.get( row.minimumTier as Tier$Level );
@@ -44,11 +46,16 @@ export class Resource
             if( row.status !== Resource$Status.Inactive && row.status !== Resource$Status.Active )
                 throw new Library.Error( `Invalid resource status: ${row.status}`, Library.Error.status.internalError );
 
-            if( !Resource.resourcesByMinimumTier.has( minimumTier.level ) )
-                Resource.resourcesByMinimumTier.set( minimumTier.level, new Set() );
+            if( !resourcesByMinimumTier.has( minimumTier.level ) )
+                resourcesByMinimumTier.set( minimumTier.level, new Set() );
 
-            Resource.resourcesByMinimumTier.get( minimumTier.level )!.add( new Resource( row.id, row.type, row.status, row.name, row.description, minimumTier ) );
+            resourcesByMinimumTier.get( minimumTier.level )!.add( new Resource( row.id, row.type, row.status, row.name, row.description, minimumTier ) );
         });
+
+        Resource.resourcesByMinimumTier.clear();
+
+        for( const [level, resources] of resourcesByMinimumTier )
+            Resource.resourcesByMinimumTier.set( level, resources );
     }
 
     private _id: Library.Identifier;

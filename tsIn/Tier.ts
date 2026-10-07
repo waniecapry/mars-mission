@@ -36,7 +36,7 @@ export class Tier
         if( this._resources.length > 0 )
             return this._resources;
 
-        for( let i = this.level; i >= Tier$Level.Silver; --i )
+        for( let i = Tier$Level.Silver; i <= this.level; ++i )
         {
             const tierResources: Set<Resource> | undefined = Resource.resourcesByMinimumTier.get( i );
     
