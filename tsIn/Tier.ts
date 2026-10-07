@@ -1,6 +1,6 @@
 import { Library } from "./Library";
 import { Center } from "./Center";
-import { Resource, Resource$Status, Resource$Aux } from "./Resource";
+import { Resource } from "./Resource";
 
 export enum Tier$Level
 {
@@ -14,6 +14,7 @@ export class Tier
     public static readonly tiers: Map<Tier$Level, Tier> = new Map();
 
     private _level: Tier$Level;
+    private _resources: Resource[];
 
     public static async initialise( client: Library.MySqlClient = Center.getMySqlClient() ): Promise<void>
     {
@@ -32,9 +33,18 @@ export class Tier
     }
     public getResources(): Resource[]
     {
-        return [...Resource.resourcesByMinimumTier]
-            .filter( ([minimumTier])=>minimumTier <= this.level )
-            .flatMap( ([, resources])=>[...resources] );
+        if( this._resources.length > 0 )
+            return this._resources;
+
+        for( let i = this.level; i >= Tier$Level.Silver; --i )
+        {
+            const tierResources: Set<Resource> | undefined = Resource.resourcesByMinimumTier.get( i );
+    
+            if( tierResources )
+                this._resources.push( ...tierResources );
+        }
+
+        return this._resources;
     }
     public canAccessResource( resource: Resource ): boolean
     {
