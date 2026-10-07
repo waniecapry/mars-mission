@@ -200,14 +200,19 @@ describe( "Actor creation", () =>
         Actor$Crew.members.clear();
         t.after( ()=>Actor$Crew.members.clear() );
         useClient( t, clientReturning( [] ) );
+
         const caller = crew();
+
         crew( "crew-2" );
-        await Promise.allSettled
+
+        const results = await Promise.allSettled
         ([
             Actor.create( caller, Actor$Role.crew, "Bo", "bo@example.com", "pass" ),
             Actor.create( caller, Actor$Role.crew, "Cy", "cy@example.com", "pass" )
         ]);
-        assert.ok( Actor$Crew.members.size <= 3, "Crew count must remain at or below three" );
+        assert.equal( results.filter( result=>result.status === "fulfilled" ).length, 1 );
+        assert.equal( results.filter( result=>result.status === "rejected" && isStatus( 500 )( result.reason ) ).length, 1 );
+        assert.equal( Actor$Crew.members.size, 3, "Exactly one request can take the third crew slot" );
     });
     test( "Invalid email, missing passenger tier, and invalid role write nothing", async t=>
     {

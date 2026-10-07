@@ -17,6 +17,8 @@ export enum Actor$Role
 
 export abstract class Actor
 {
+    private static _pendingCrewCreations: number = 0;
+
     private _id: Library.Identifier;
     private _name: string;
     private _role: Actor$Role;
@@ -91,23 +93,32 @@ export abstract class Actor
             return Actor$Passenger.members.get( passengerAux.id )!;
         }
         else if( role === Actor$Role.crew )
-        {        
-            if( Actor$Crew.members.size === 3 )
+        {
+            if( Actor$Crew.members.size + Actor._pendingCrewCreations >= 3 )
                 throw new Library.Error( "Cannot create more than 3 crew members", Library.Error.status.internalError );
 
-            const salt: string = randomBytes( 16 ).toString( "hex" );
-            const pass: string = Library.makeHash( password.trim(), salt );
-            const crewAux: Actor$Aux = { id: Library.getStringId(), role, name: name.trim(), email: normalizedEmail };
+            ++Actor._pendingCrewCreations; // Increment pending crew creations to prevent race conditions
 
-            await Center.getMySqlClient().execute
-            (
-                "INSERT INTO Actor (id, role, name, email, salt, password) VALUES (?, ?, ?, ?, ?, ?)",
-                [crewAux.id, crewAux.role, crewAux.name, normalizedEmail, salt, pass ]
-            );
+            try
+            {
+                const salt: string = randomBytes( 16 ).toString( "hex" );
+                const pass: string = Library.makeHash( password.trim(), salt );
+                const crewAux: Actor$Aux = { id: Library.getStringId(), role, name: name.trim(), email: normalizedEmail };
 
-            Actor$Crew.members.set( crewAux.id, new Actor$Crew( crewAux.id, crewAux.name, normalizedEmail, salt, pass ) );
+                await Center.getMySqlClient().execute
+                (
+                    "INSERT INTO Actor (id, role, name, email, salt, password) VALUES (?, ?, ?, ?, ?, ?)",
+                    [crewAux.id, crewAux.role, crewAux.name, normalizedEmail, salt, pass ]
+                );
 
-            return Actor$Crew.members.get( crewAux.id )!;
+                Actor$Crew.members.set( crewAux.id, new Actor$Crew( crewAux.id, crewAux.name, normalizedEmail, salt, pass ) );
+
+                return Actor$Crew.members.get( crewAux.id )!;
+            }
+            finally
+            {
+                --Actor._pendingCrewCreations;
+            }
         }
 
         throw new Library.Error( "Invalid role", Library.Error.status.internalError );
