@@ -1,5 +1,6 @@
+import { Library } from "./Library";
 import { Center } from "./Center";
-import { Resource, Resource$Aux, Resource$Status } from "./Resource";
+import { Resource, Resource$Status, Resource$Aux } from "./Resource";
 
 export enum Tier$Level
 {
@@ -8,26 +9,53 @@ export enum Tier$Level
     Platinum = 3
 }
 
-export abstract class Tier
+export class Tier
 {
     public static readonly tiers: Map<Tier$Level, Tier> = new Map();
 
-    protected _resources: Resource[] = [];
+    private _level: Tier$Level;
+    private _resources: Resource[] = [];
 
-    public static async initialise(): Promise<void>
+    public static async initialise( client: Library.MySqlClient = Center.getMySqlClient() ): Promise<void>
     {
-        Tier.tiers.set( Tier$Level.Silver, new Tier$Silver() );
-        Tier.tiers.set( Tier$Level.Gold, new Tier$Gold() );
-        Tier.tiers.set( Tier$Level.Platinum, new Tier$Platinum() );
+        Tier.tiers.set( Tier$Level.Silver, new Tier( Tier$Level.Silver ) );
+        Tier.tiers.set( Tier$Level.Gold, new Tier( Tier$Level.Gold ) );
+        Tier.tiers.set( Tier$Level.Platinum, new Tier( Tier$Level.Platinum ) );
+    
+        const [rows]: any = await client.execute
+        (
+            "SELECT id, type, status, name, description, minimumTier FROM Resource ORDER BY minimumTier, name, id",
+            []
+        );
+
+        if( !Array.isArray( rows ) )
+            throw new Library.Error( "Expected resource rows from the database", Library.Error.status.internalError );
+
+        const resources = (rows as Resource$Aux[]).map( row=>
+        {
+            const minimumTier: Tier | undefined = Tier.tiers.get( row.minimumTier as Tier$Level );
+    
+            if( !minimumTier )
+                throw new Library.Error( `Unexpected resource tier: ${row.minimumTier}`, Library.Error.status.internalError );
+
+            if( row.status !== Resource$Status.Inactive && row.status !== Resource$Status.Active )
+                throw new Library.Error( `Invalid resource status: ${row.status}`, Library.Error.status.internalError );
+
+            return new Resource( row.id, row.type, row.status, row.name, row.description, minimumTier );
+        });
 
         for( const tier of Tier.tiers.values() )
-        {
-            await tier.initialise();
-        }
+            tier.setResources( resources.filter( resource=>resource.minimumTier.level <= tier.level ) );
     }
 
-    public abstract get level(): Tier$Level;
-    public abstract initialise(): Promise<void>;
+    public constructor( level: Tier$Level )
+    {
+        this._level = level;
+    }
+    public get level(): Tier$Level
+    {
+        return this._level;
+    }
     public getResources(): Resource[]
     {
         return [...this._resources];
@@ -36,65 +64,8 @@ export abstract class Tier
     {
         return resource.minimumTier.level <= this.level;
     }
-    protected async loadResources(): Promise<Resource[]>
+    private setResources( resources: Resource[] ): void
     {
-        const [rows] = await Center.getMySqlClient().execute
-        (
-            "SELECT id, type, status, name, description, minimumTier FROM Resource WHERE minimumTier = ? ORDER BY name, id",
-            [this.level]
-        );
-    
-        if( !Array.isArray( rows ) )
-            throw new TypeError( "Expected resource rows from the database" );
-
-        return (rows as Resource$Aux[]).map( row=>
-        {
-            if( row.minimumTier !== this.level )
-                throw new RangeError( `Unexpected resource tier: ${row.minimumTier}` );
-        
-            if( row.status !== Resource$Status.Inactive && row.status !== Resource$Status.Active )
-                throw new RangeError( `Invalid resource status: ${row.status}` );
-
-            return new Resource( row.id, row.type, row.status, row.name, row.description, this );
-        });
-    }
-}
-export class Tier$Silver extends Tier
-{
-    public get level(): Tier$Level
-    {
-        return Tier$Level.Silver;
-    }
-    public override async initialise(): Promise<void>
-    {
-        this._resources = await this.loadResources();
-    }
-}
-export class Tier$Gold extends Tier$Silver
-{
-    public override get level(): Tier$Level
-    {
-        return Tier$Level.Gold;
-    }
-    public override async initialise(): Promise<void>
-    {
-        await super.initialise();
-    
-        const goldResources: Resource[] = await this.loadResources();
-        this._resources = [...this._resources, ...goldResources];
-    }
-}
-export class Tier$Platinum extends Tier$Gold
-{
-    public override get level(): Tier$Level
-    {
-        return Tier$Level.Platinum;
-    }
-    public override async initialise(): Promise<void>
-    {
-        await super.initialise();
-    
-        const platinumResources: Resource[] = await this.loadResources();
-        this._resources = [...this._resources, ...platinumResources];
+        this._resources = resources;
     }
 }

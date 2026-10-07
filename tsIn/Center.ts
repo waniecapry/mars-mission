@@ -2,7 +2,7 @@ import { resolve } from "node:path";
 import dotenv from "dotenv";
 import { Library } from "./Library";
 import { Actor } from "./Actor";
-import { Tier, Tier$Gold, Tier$Level, Tier$Platinum, Tier$Silver } from "./Tier";
+import { Tier } from "./Tier";
 
 export namespace Center
 {
@@ -17,12 +17,12 @@ export namespace Center
         const database: string | undefined = process.env.DB_NAME;
     
         if( !host || !user || !database )
-            throw new Error( "DB_HOST, DB_USER, and DB_NAME must be configured" );
+            throw new Library.Error( "DB_HOST, DB_USER, and DB_NAME must be configured" , Library.Error.status.internalError );
 
         const port = Number( process.env.DB_PORT ?? 3306 );
     
         if( !Number.isInteger( port ) || port < 1 || port > 65535 )
-            throw new Error( "DB_PORT must be a valid port" );
+            throw new Library.Error( "DB_PORT must be a valid port" , Library.Error.status.internalError );
 
         const client: Library.MySqlClient = new Library.MySqlClient( host, user, process.env.DB_PASSWORD ?? "", database, port );
     
@@ -36,7 +36,7 @@ export namespace Center
     export function getMySqlClient(): Library.MySqlClient
     {
         if( !_mysqlClient )
-            throw new Error( "MySQL client has not been initialised" );
+            throw new Library.Error( "MySQL client has not been initialised" , Library.Error.status.internalError );
 
         return _mysqlClient;
     }
