@@ -6,9 +6,10 @@ import cors from "cors";
 import helmet from "helmet";
 
 import { Library } from "./Library";
-import { Actor, Actor$Aux, Actor$Passenger$Aux } from "./Actor";
+import { Actor, Actor$Aux, Actor$Crew, Actor$Passenger, Actor$Passenger$Aux } from "./Actor";
 import { Tier } from "./Tier";
 import { Resource, Resource$Aux } from "./Resource";
+import { handleRequests } from "./requests";
 
 declare module "express-session"
 {
@@ -81,9 +82,9 @@ export namespace Center
             const path: string = req.path.toLowerCase();
             const isPrivateRoute: boolean = path === "/i" || path.startsWith( "/i/" ); // anything starts with i considered as private and need authorisation
 
-            if( isPrivateRoute ) // actually in ideal project, you dont check if session authenticated like this, you make a method in the primary process, and worker should ask the primary process for this.
+            if( isPrivateRoute )
             {
-                const isAuthenticatedSession: boolean = await Worker.isAuthenticatedSession( req );
+                const isAuthenticatedSession: boolean = Center.isAuthenticatedSession( req );
             
                 if( !isAuthenticatedSession )
                 {
@@ -128,6 +129,10 @@ export namespace Center
             actor: caller.toAux(),
             resources: resources
         };
+    }
+    export function isAuthenticatedSession( req: Request ): boolean
+    {
+        return req.session.isAuthenticated === true && req.session.userId !== undefined && (Actor$Crew.members.has( req.session.userId ) || Actor$Passenger.members.has( req.session.userId ));
     }
 
     interface HttpServer$Options 
