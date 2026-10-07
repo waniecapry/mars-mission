@@ -164,6 +164,19 @@ export class Actor$Passenger extends Actor
     {
         return this._tier.canAccessResource( resource );
     }
+    public async setTier( caller: Actor, tier: Tier ): Promise<void>
+    {
+        if( !(caller instanceof Actor$Crew) )
+            throw new Library.Error( "Only crew members can set passenger tiers", Library.Error.status.unauthorized );
+
+        await Center.getMySqlClient().execute
+        (
+            "UPDATE Actor$Passenger SET tier = ? WHERE id = ?;",
+            [tier.level, this.id]
+        );
+
+        this._tier = tier;
+    }
 }
 export class Actor$Crew extends Actor
 {
