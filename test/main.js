@@ -1,10 +1,10 @@
 const { describe, test } = require( "node:test" );
 const assert = require( "node:assert/strict" );
-const { Library } = require( "../jsOut/Library" );
-const { Actor, Actor$Crew, Actor$Passenger, Actor$Role } = require( "../jsOut/Actor" );
-const { Resource, Resource$Status } = require( "../jsOut/Resource" );
-const { Tier, Tier$Level } = require( "../jsOut/Tier" );
-const { Center } = require( "../jsOut/Center" );
+const { Library } = require( "../../jsOut/Library" );
+const { Actor, Actor$Crew, Actor$Passenger, Actor$Role } = require( "../../jsOut/Actor" );
+const { Resource, Resource$Status } = require( "../../jsOut/Resource" );
+const { Tier, Tier$Level } = require( "../../jsOut/Tier" );
+const { Center } = require( "../../jsOut/Center" );
 
 function resourceRow( id, minimumTier, status = Resource$Status.Active )
 {
