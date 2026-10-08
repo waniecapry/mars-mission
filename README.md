@@ -13,23 +13,7 @@ After setup, configure `server/data.env` with `DB_NAME=marsMission` and the same
 
 Run `npm test` and `npm start` from the `server` directory. The server reads `server/data.env` and requires `DB_HOST`, `DB_USER`, `DB_NAME`, `PORT`, and `SESSION_SECRET`. `DB_PORT` defaults to 3306, and `DB_PASSWORD` defaults to an empty string.
 
-Sessions use the same MySQL settings unless `SESSION_STORE_HOST`, `SESSION_STORE_PORT`, `SESSION_STORE_DATABASE`, `SESSION_STORE_USER`, or `SESSION_STORE_PASS` are provided. Set `FRONT_END_ORIGIN` when the frontend runs on another origin and needs credentialed CORS requests.
-
-## Vue API
-
-The Vue app requests `GET /i/session` on startup. A `401` response means it should show the login screen; a successful response contains the signed-in actor and accessible resources. Use `fetch(url, { credentials: "include" })` for session requests. When Vite runs on a separate origin such as `http://localhost:5173`, set `FRONT_END_ORIGIN` to that exact origin in `server/data.env`. All `/i/` routes require a signed-in session; `/login` is public.
-
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `POST` | `/login` | Sign in with `{ "email": "...", "password": "..." }`; returns actor and resources. |
-| `POST` | `/i/logout` | End the current session. |
-| `GET` | `/i/session` | Return actor and accessible resources for the current session. |
-| `GET` | `/i/resources` | List resources accessible to the current user. |
-| `GET` | `/i/passengers` | Crew only: list passengers. |
-| `POST` | `/i/passengers` | Crew only: create a passenger with `name`, `email`, `password`, and numeric `tier` (1–3). |
-| `PATCH` | `/i/passengers/:id/tier` | Crew only: change a passenger's tier with `{ "tier": 1 }`, `2`, or `3`. |
-
-The backend serves a built Vue app from `client/dist`; during Vite development, open the Vite URL and call these routes at the backend origin.
+Sessions use the same MySQL settings unless `SESSION_STORE_HOST`, `SESSION_STORE_PORT`, `SESSION_STORE_DATABASE`, `SESSION_STORE_USER`, or `SESSION_STORE_PASS` are provided.
 
 ## Project Extensions (Should implement when there's more time)
 - I was planning to use worker processes for the nodejs server. But seems like I may not need this now, maybe if this is a production project, i will make worker processes to handle incoming HTTP client or websocket client.

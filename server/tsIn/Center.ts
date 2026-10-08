@@ -2,7 +2,6 @@ import { resolve } from "node:path";
 import dotenv from "dotenv";
 import express, { type Express, type Request, type Response, type NextFunction, type RequestHandler } from "express";
 import session from "express-session";
-import cors from "cors";
 import helmet from "helmet";
 
 import { Library } from "./Library";
@@ -91,11 +90,6 @@ export namespace Center
         );
 
         await _server.initialise( options.sessionSecret );
-
-        const frontEndOrigin = process.env.FRONT_END_ORIGIN?.trim();
-
-        if( frontEndOrigin )
-            _server.app.use( cors( { origin: frontEndOrigin, credentials: true } ) );
 
         _server.app.use( (req: Request, res: Response, next: NextFunction) =>
         {

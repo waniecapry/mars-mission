@@ -130,6 +130,16 @@ export abstract class Actor
 
         throw new Library.Error( "Invalid role", Library.Error.status.internalError );
     }
+    public static getByEmail( email: string ): Actor
+    {
+        const members: Actor[] = [...Actor$Crew.members.values(), ...Actor$Passenger.members.values()];
+
+        for( const a of members )
+            if( email === a.email )
+                return a;
+
+        throw new Library.Error( `User with email address ${email} is not found`, Library.Error.status.internalError );
+    }
 
     public constructor( id: Library.Identifier, name: string, role: Actor$Role, email: string, salt: string, password: string )
     {
