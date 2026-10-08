@@ -91,7 +91,13 @@ export namespace Center
         );
 
         await _server.initialise( options.sessionSecret );
+        _server.app.use( (req: Request, res: Response, next: NextFunction) =>
+        {
+            if( req.path !== "/assets" && !req.path.startsWith( "/assets/" ) )
+                res.setHeader( "Cache-Control", "no-store" );
 
+            next();
+        });
         _server.app.use( (req: Request, res: Response, next: NextFunction)=>
         {
             const path: string = req.path.toLowerCase();
@@ -279,7 +285,7 @@ export namespace Center
 
             this._mysqlClient = mysqlClient;
         }
-        public get( sid: string, cb: ( err: Error | null, data?: session.SessionData | null ) => void ): void
+        public override get( sid: string, cb: ( err: Error | null, data?: session.SessionData | null ) => void ): void
         {
             void (async ()=>
             {
@@ -307,7 +313,7 @@ export namespace Center
                 cb( null, data );
             })();
         }
-        public set( sid: string, data: session.SessionData, cb?: ( err?: Error | null ) => void ): void
+        public override set( sid: string, data: session.SessionData, cb?: ( err?: Error | null ) => void ): void
         {
             void (async () =>
             {
@@ -357,7 +363,7 @@ export namespace Center
                 }
             })();
         }
-        public destroy( sid: string, cb?: ( err?: Error | null ) => void ): void
+        public override destroy( sid: string, cb?: ( err?: Error | null ) => void ): void
         {
             void (async ()=>
             {
