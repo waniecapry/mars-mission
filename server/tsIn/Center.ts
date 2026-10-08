@@ -94,33 +94,6 @@ export namespace Center
         );
 
         await _server.initialise( options.sessionSecret );
-
-        _server.app.use( (req: Request, res: Response, next: NextFunction) =>
-        {
-            if( req.path !== "/assets" && !req.path.startsWith( "/assets/" ) )
-                res.setHeader( "Cache-Control", "no-store" );
-
-            next();
-        });
-        _server.app.use( (req: Request, res: Response, next: NextFunction)=>
-        {
-            const path: string = req.path.toLowerCase();
-            const isPrivateRoute: boolean = path === "/i" || path.startsWith( "/i/" ); // anything starts with i considered as private and need authorisation
-
-            if( isPrivateRoute )
-            {
-                const isAuthenticatedSession: boolean = Center.isAuthenticatedSession( req );
-            
-                if( !isAuthenticatedSession )
-                {
-                    res.status( 401 ).json( { error: "Authentication required" } );
-
-                    return;
-                }
-            }
-
-            next();
-        });
         handleRequests( _server.app );
         await _server.start();
     }

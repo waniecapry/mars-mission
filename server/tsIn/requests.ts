@@ -9,6 +9,32 @@ export function handleRequests( app: Application ): void
 {
     const clientDirectory = resolve( __dirname, "../../client/dist" );
 
+    app.use( (req: Request, res: Response, next: NextFunction) =>
+    {
+        if( req.path !== "/assets" && !req.path.startsWith( "/assets/" ) )
+            res.setHeader( "Cache-Control", "no-store" );
+
+        next();
+    });
+    app.use( (req: Request, res: Response, next: NextFunction)=>
+    {
+        const path: string = req.path.toLowerCase();
+        const isPrivateRoute: boolean = path === "/i" || path.startsWith( "/i/" ); // anything starts with i considered as private and need authorisation
+
+        if( isPrivateRoute )
+        {
+            const isAuthenticatedSession: boolean = Center.isAuthenticatedSession( req );
+        
+            if( !isAuthenticatedSession )
+            {
+                res.status( Center.HttpServer.status.unauthorized ).json( { error: "Authentication required" } );
+
+                return;
+            }
+        }
+
+        next();
+    });
     app.use( ["/login", "/i"], (req: Request, res: Response, next: NextFunction)=> // Entry point and to ensure the origin is correct.
     {
         if( req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS" )
