@@ -91,6 +91,12 @@ export namespace Center
         );
 
         await _server.initialise( options.sessionSecret );
+
+        const frontEndOrigin = process.env.FRONT_END_ORIGIN?.trim();
+
+        if( frontEndOrigin )
+            _server.app.use( cors( { origin: frontEndOrigin, credentials: true } ) );
+
         _server.app.use( (req: Request, res: Response, next: NextFunction) =>
         {
             if( req.path !== "/assets" && !req.path.startsWith( "/assets/" ) )
@@ -252,24 +258,28 @@ export namespace Center
             if( this._endIintialised )
                 return;
     
-            this._app.use( (req: Request, res: Response, next: NextFunction)=>
+            this._app.use( (req: Request, res: Response)=>
             {
-                res.status( 404 );
-
-                res.send( `` );
+                res.status( 404 ).json( { error: "Route not found" } );
             });
-            // https://expressjs.com/en/guide/error-handling.html
-            this._app.use( ( err: any, req: Request, res: Response, next: NextFunction )=> 
-            {       
-                console.error( "Error occured:", req.ip, req.url, err );
+            this._app.use( (err: unknown, req: Request, res: Response, next: NextFunction)=>
+            {
+                if( res.headersSent )
+                {
+                    next( err );
+        
+                    return;
+                }
 
-                if( !err )
-                    return next();
+                const error: any = err as Error & { code?: string, status?: number };
+                const status: number = error.code === "ER_DUP_ENTRY" ? 409 : error instanceof Library.Error ? error.status : typeof error.status === "number" && error.status >= 400 && error.status < 500 ? error.status : 500;
 
-                if( res.statusCode == 200 )
-                    res.status( 500 );
+                if( status >= 500 )
+                    console.error( "Request failed:", req.ip, req.url, err );
 
-                res.send( `` );
+                const message = status === 409 ? "The same data already exists" : status === 404 ? "Route not found" : status >= 500 ? "Internal server error" : error.message;
+    
+                res.status( status ).json( { error: message } );
             });
 
             this._endIintialised = true;
