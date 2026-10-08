@@ -28,6 +28,10 @@ export namespace Center
         resources: Resource$Aux[];
         passengers?: Actor$Passenger$Aux[];
     };
+    export type HttpServer$StatusKey = "ok" | "created" | "accepted" | "noContent" | "partialContent" | "movedPermanently" | "found" | "seeOther" |
+        "notModified" | "temporaryRedirect" | "permanentRedirect" | "logicError" | "badRequest" | "unauthorized" | "forbidden" | "notFound" | "methodNotAllowed" |
+        "notAcceptable" | "requestTimeout" | "conflict" | "gone" | "preconditionFailed" | "payloadTooLarge" |
+        "uriTooLong" | "unsupportedMediaType" | "rangeNotSatisfiable" | "unprocessableContent" | "tooManyRequests" | "requestHeaderFieldsTooLarge" | "internalError" | "notImplemented" | "badGateway" | "serviceUnavailable" | "gatewayTimeout";
 
     let _mysqlClient: Library.MySqlClient | null = null;
     let _server: HttpServer;
@@ -183,7 +187,7 @@ export namespace Center
 
     export class HttpServer
     {
-        public static readonly status: Record<string, number> = 
+        public static readonly status: Record<HttpServer$StatusKey, number> = 
         {
             ok: 200,
             created: 201,
