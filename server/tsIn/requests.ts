@@ -4,6 +4,8 @@ import { Library } from "./Library";
 import { Center } from "./Center";
 import { Actor, Actor$Crew, Actor$Passenger, Actor$Role } from "./Actor";
 import { Tier } from "./Tier";
+import { Resource, Resource$Status } from "./Resource";
+import { Usage, Usage$Outcome } from "./Usage";
 
 export function handleRequests( app: Application ): void
 {
@@ -118,6 +120,167 @@ export function handleRequests( app: Application ): void
         const caller: Actor | undefined = req.session.userRole === Actor$Role.crew ? Actor$Crew.members.get( req.session.userId! )! : Actor$Passenger.members.get( req.session.userId! )!;
 
         res.json( Center.toAux( caller ).resources );
+    });
+    app.post( "/i/resources", async (req: Request, res: Response)=> // Provision a resource
+    {
+        const caller: Actor$Crew | undefined = req.session.userRole === Actor$Role.crew ? Actor$Crew.members.get( req.session.userId! ) : undefined;
+
+        if( !caller )
+        {
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Unauthorised" } );
+
+            return;
+        }
+
+        const body: unknown = req.body;
+
+        if( !body || typeof body !== "object" || Array.isArray( body ) )
+        {
+            res.status( Center.HttpServer.status.badRequest ).json( { error: "Resource details are required" } );
+
+            return;
+        }
+
+        const { name, description, minimumTier } = body as Record<string, unknown>;
+        const tier: Tier | undefined = Tier.tiers.get( minimumTier as number );
+
+        if
+        (
+            typeof name !== "string" || !name.trim() || name.trim().length > 30 ||
+            typeof description !== "string" || description.trim().length > 200 || !tier
+        )
+        {
+            res.status( Center.HttpServer.status.badRequest ).json( { error: "Invalid resource details or tier" } );
+
+            return;
+        }
+
+        const resource: Resource = await Resource.create( caller, name, description, tier );
+
+        res.status( Center.HttpServer.status.created ).json( resource.toAux( caller ) );
+    });
+    app.patch( "/i/resources/:id/status", async (req: Request, res: Response)=> // Provision or decommission a resource
+    {
+        const caller: Actor$Crew | undefined = req.session.userRole === Actor$Role.crew ? Actor$Crew.members.get( req.session.userId! ) : undefined;
+
+        if( !caller )
+        {
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Unauthorised" } );
+
+            return;
+        }
+
+        const resource: Resource | undefined = Resource.getById( req.params.id as Library.Identifier );
+
+        if( !resource )
+        {
+            res.status( Center.HttpServer.status.notFound ).json( { error: "Resource not found" } );
+
+            return;
+        }
+
+        const status: unknown = req.body?.status;
+
+        if( status !== Resource$Status.Active && status !== Resource$Status.Inactive )
+        {
+            res.status( Center.HttpServer.status.badRequest ).json( { error: "Invalid resource status" } );
+
+            return;
+        }
+
+        await resource.setStatus( caller, status );
+        res.json( resource.toAux( caller ) );
+    });
+    app.post( "/i/resources/:id/usage", async (req: Request, res: Response)=> // Use a resource
+    {
+        const caller: Actor$Passenger | undefined = req.session.userRole === Actor$Role.passenger ? Actor$Passenger.members.get( req.session.userId! ) : undefined;
+
+        if( !caller )
+        {
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Only passengers can use resources" } );
+
+            return;
+        }
+
+        const resource: Resource | undefined = Resource.getById( req.params.id as Library.Identifier );
+
+        if( !resource )
+        {
+            res.status( Center.HttpServer.status.notFound ).json( { error: "Resource not found" } );
+
+            return;
+        }
+
+        const usage = await Usage.record( caller, resource );
+
+        if( usage.outcome === Usage$Outcome.Denied )
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Membership level does not permit this resource" } );
+
+        else if( usage.outcome === Usage$Outcome.Unavailable )
+            res.status( Center.HttpServer.status.conflict ).json( { error: "Resource is unavailable" } );
+
+        else res.status( Center.HttpServer.status.created ).json( usage );
+    });
+    app.get( "/i/usage", async (req: Request, res: Response)=> // Passenger's own resource history
+    {
+        const caller: Actor$Passenger | undefined = req.session.userRole === Actor$Role.passenger ? Actor$Passenger.members.get( req.session.userId! ) : undefined;
+
+        if( !caller )
+        {
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Only passengers can view their own usage" } );
+
+            return;
+        }
+
+        res.json( await Usage.getHistory( caller, caller ) );
+    });
+    app.get( "/i/passengers/:id/usage", async (req: Request, res: Response)=> // Crew view of a passenger's history
+    {
+        const caller: Actor$Crew | undefined = req.session.userRole === Actor$Role.crew ? Actor$Crew.members.get( req.session.userId! ) : undefined;
+
+        if( !caller )
+        {
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Unauthorised" } );
+
+            return;
+        }
+
+        const passenger: Actor$Passenger | undefined = Actor$Passenger.members.get( req.params.id as Library.Identifier );
+
+        if( !passenger )
+        {
+            res.status( Center.HttpServer.status.notFound ).json( { error: "Passenger not found" } );
+
+            return;
+        }
+
+        res.json( await Usage.getHistory( caller, passenger ) );
+    });
+    app.get( "/i/activity", async (req: Request, res: Response)=> // Recent resource interactions for crew
+    {
+        const caller: Actor$Crew | undefined = req.session.userRole === Actor$Role.crew ? Actor$Crew.members.get( req.session.userId! ) : undefined;
+
+        if( !caller )
+        {
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Unauthorised" } );
+
+            return;
+        }
+
+        res.json( await Usage.getActivity( caller ) );
+    });
+    app.get( "/i/reports/usage", async (req: Request, res: Response)=> // Crew report by tier and resource
+    {
+        const caller: Actor$Crew | undefined = req.session.userRole === Actor$Role.crew ? Actor$Crew.members.get( req.session.userId! ) : undefined;
+
+        if( !caller )
+        {
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Unauthorised" } );
+
+            return;
+        }
+
+        res.json( await Usage.getReport( caller ) );
     });
     app.get( "/i/passengers", (req: Request, res: Response)=> // Get the list of passengers
     {

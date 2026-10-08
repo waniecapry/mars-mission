@@ -64,4 +64,20 @@ CREATE TABLE Resource
     PRIMARY KEY(id)
 ) DEFAULT CHARACTER SET = utf8;
 
-INSERT INTO Configuration(indexingKey, val) VALUES('dbVersion', "1");
+CREATE TABLE Resource$Usage
+(
+    id VARCHAR(36) NOT NULL,
+    passengerId VARCHAR(36) NOT NULL,
+    resourceId VARCHAR(36) NOT NULL,
+    tierAtUse TINYINT NOT NULL,
+    outcome TINYINT NOT NULL,
+    occurredAt BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY(id),
+    FOREIGN KEY(passengerId) REFERENCES Actor$Passenger(id),
+    FOREIGN KEY(resourceId) REFERENCES Resource(id),
+    INDEX(passengerId, occurredAt),
+    INDEX(outcome, tierAtUse),
+    INDEX(outcome, resourceId)
+) DEFAULT CHARACTER SET = utf8;
+
+INSERT INTO Configuration(indexingKey, val) VALUES('dbVersion', "2");
