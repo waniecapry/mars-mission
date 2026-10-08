@@ -6,7 +6,7 @@ import cors from "cors";
 import helmet from "helmet";
 
 import { Library } from "./Library";
-import { Actor, Actor$Aux, Actor$Crew, Actor$Passenger, Actor$Passenger$Aux } from "./Actor";
+import { Actor, Actor$Aux, Actor$Crew, Actor$Passenger, Actor$Passenger$Aux, Actor$Role } from "./Actor";
 import { Tier } from "./Tier";
 import { Resource, Resource$Aux } from "./Resource";
 import { handleRequests } from "./requests";
@@ -16,6 +16,7 @@ declare module "express-session"
     interface SessionData
     {
         userId?: Library.Identifier;
+        userRole?: Actor$Role;
         isAuthenticated?: boolean;
     }
 }
@@ -66,8 +67,7 @@ export namespace Center
         const options: HttpServer$Options =
         {
             port: serverPort,
-            sessionSecret,
-            frontEndOrigin: process.env.FRONT_END_ORIGIN
+            sessionSecret
         };
 
         const client: Library.MySqlClient = new Library.MySqlClient( host, user, process.env.DB_PASSWORD ?? "", database, port );
@@ -90,7 +90,7 @@ export namespace Center
             process.env.SESSION_STORE_PASS ?? process.env.DB_PASSWORD ?? ""
         );
 
-        await _server.initialise( options.sessionSecret, options.frontEndOrigin );
+        await _server.initialise( options.sessionSecret );
 
         _server.app.use( (req: Request, res: Response, next: NextFunction)=>
         {
@@ -147,14 +147,32 @@ export namespace Center
     }
     export function isAuthenticatedSession( req: Request ): boolean
     {
-        return req.session.isAuthenticated === true && req.session.userId !== undefined && (Actor$Crew.members.has( req.session.userId ) || Actor$Passenger.members.has( req.session.userId ));
+        if( req.session.isAuthenticated && req.session.userId !== undefined )
+        {
+            if( req.session.userRole === Actor$Role.crew && Actor$Crew.members.has( req.session.userId ) )
+                return true;
+
+            if( req.session.userRole === Actor$Role.passenger && Actor$Passenger.members.has( req.session.userId ) )
+                return true;
+        }
+
+        return false;
+    }
+    export function renderLoginView(): string
+    {
+        return "";
+    }
+    export function renderMainView( caller: Actor ): string
+    {
+        const aux: Aux = Center.toAux( caller );
+
+        return "";
     }
 
-    interface HttpServer$Options 
+    interface HttpServer$Options
     {
         port: number;
         sessionSecret: string;
-        frontEndOrigin?: string;
     }
 
     export class HttpServer
@@ -194,7 +212,7 @@ export namespace Center
                 server.once( "error", reject );
             });
         }
-        public async initialise( sessionSecret: string, frontEndOrigin?: string ): Promise<void>
+        public async initialise( sessionSecret: string ): Promise<void>
         {
             if( this._initialised )
                 return;
@@ -216,10 +234,6 @@ export namespace Center
             });
     
             this._app.disable( "x-powered-by" );
-    
-            if( frontEndOrigin )
-                this._app.use( cors( { origin: frontEndOrigin, credentials: true } ) );
-
             this._app.use( helmet() );
             this._app.use( express.json( { limit: "10mb" } ) );
             this._app.use( express.urlencoded( { extended: true, limit: "10mb" } ) );
