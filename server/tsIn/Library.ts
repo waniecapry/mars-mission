@@ -83,28 +83,6 @@ export namespace Library
     }
     export class Error extends globalThis.Error
     {
-        public static readonly status: Record<string, number> = 
-        {
-            logicError: 400,
-            badRequest: 400,
-            unauthorized: 401,
-            forbidden: 403,
-            notFound: 404,
-            methodNotAllowed: 405,
-            requestTimeout: 408,
-            conflict: 409,
-            gone: 410,
-            payloadTooLarge: 413,
-            unsupportedMediaType: 415,
-            unprocessableContent: 422,
-            tooManyRequests: 429,
-            internalError: 500,
-            notImplemented: 501,
-            badGateway: 502,
-            serviceUnavailable: 503,
-            gatewayTimeout: 504
-        };
-
         public static makeAux( e: globalThis.Error | object ): Error$Aux
         {
             if( e instanceof Error )

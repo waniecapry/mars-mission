@@ -32,7 +32,7 @@ export class Resource
         );
 
         if( !Array.isArray( rows ) )
-            throw new Library.Error( "Expected resource rows from the database", Library.Error.status.internalError );
+            throw new Library.Error( "Expected resource rows from the database", Center.HttpServer.status.internalError );
 
         const resourcesByMinimumTier: Map<Tier$Level, Set<Resource>> = new Map();
 
@@ -41,10 +41,10 @@ export class Resource
             const minimumTier: Tier | undefined = Tier.tiers.get( row.minimumTier as Tier$Level );
     
             if( !minimumTier )
-                throw new Library.Error( `Unexpected resource tier: ${row.minimumTier}`, Library.Error.status.internalError );
+                throw new Library.Error( `Unexpected resource tier: ${row.minimumTier}`, Center.HttpServer.status.internalError );
 
             if( row.status !== Resource$Status.Inactive && row.status !== Resource$Status.Active )
-                throw new Library.Error( `Invalid resource status: ${row.status}`, Library.Error.status.internalError );
+                throw new Library.Error( `Invalid resource status: ${row.status}`, Center.HttpServer.status.internalError );
 
             if( !resourcesByMinimumTier.has( minimumTier.level ) )
                 resourcesByMinimumTier.set( minimumTier.level, new Set() );
@@ -101,7 +101,7 @@ export class Resource
     public toAux( caller: Actor ): Resource$Aux
     {
         if( !caller.hasPermission( this ) )
-            throw new Library.Error( "Caller does not have permission to access this resource", Library.Error.status.unauthorized );
+            throw new Library.Error( "Caller does not have permission to access this resource", Center.HttpServer.status.unauthorized );
 
         return { 
             id: this._id, 

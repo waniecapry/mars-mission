@@ -95,7 +95,7 @@ test( "Vue API authenticates sessions and enforces passenger and crew permission
     assert.equal( (await request( "POST", "/login", { email: "ari@example.com", password: "wrong" } )).status, 401 );
     assert.equal( (await request( "POST", "/login", { email: "ari@example.com", password: "crew-pass" }, undefined, "http://evil.example" )).status, 403 );
 
-    const passengerLogin = await request( "POST", "/login", { email: "MIRA@EXAMPLE.COM", password: "passenger-pass" } );
+    const passengerLogin = await request( "POST", "/login", { email: "MIRA@EXAMPLE.COM", password: "passenger-pass" }, undefined, base );
 
     assert.equal( passengerLogin.status, 200 );
     assert.ok( passengerLogin.cookie );

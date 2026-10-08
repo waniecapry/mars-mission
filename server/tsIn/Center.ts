@@ -41,27 +41,27 @@ export namespace Center
         const database: string | undefined = process.env.DB_NAME;
     
         if( !host || !user || !database )
-            throw new Library.Error( "DB_HOST, DB_USER, and DB_NAME must be configured" , Library.Error.status.internalError );
+            throw new Library.Error( "DB_HOST, DB_USER, and DB_NAME must be configured" , Center.HttpServer.status.internalError );
 
         const port: number = Number( process.env.DB_PORT ?? 3306 );
     
         if( !Number.isInteger( port ) || port < 1 || port > 65535 )
-            throw new Library.Error( "DB_PORT must be a valid port" , Library.Error.status.internalError );
+            throw new Library.Error( "DB_PORT must be a valid port" , Center.HttpServer.status.internalError );
 
         const serverPort: number = Number( process.env.PORT );
 
         if( !Number.isInteger( serverPort ) || serverPort < 1 || serverPort > 65535 )
-            throw new Library.Error( "PORT must be a valid port", Library.Error.status.internalError );
+            throw new Library.Error( "PORT must be a valid port", Center.HttpServer.status.internalError );
 
         const sessionSecret: string | undefined = process.env.SESSION_SECRET;
 
         if( !sessionSecret?.trim() )
-            throw new Library.Error( "SESSION_SECRET must be configured", Library.Error.status.internalError );
+            throw new Library.Error( "SESSION_SECRET must be configured", Center.HttpServer.status.internalError );
 
         const sessionStorePort: number = Number( process.env.SESSION_STORE_PORT || port );
 
         if( !Number.isInteger( sessionStorePort ) || sessionStorePort < 1 || sessionStorePort > 65535 )
-            throw new Library.Error( "SESSION_STORE_PORT must be a valid port", Library.Error.status.internalError );
+            throw new Library.Error( "SESSION_STORE_PORT must be a valid port", Center.HttpServer.status.internalError );
 
         const options: HttpServer$Options =
         {
@@ -123,7 +123,7 @@ export namespace Center
     export function getMySqlClient(): Library.MySqlClient
     {
         if( !_mysqlClient )
-            throw new Library.Error( "MySQL client has not been initialised" , Library.Error.status.internalError );
+            throw new Library.Error( "MySQL client has not been initialised" , Center.HttpServer.status.internalError );
 
         return _mysqlClient;
     }
@@ -136,7 +136,7 @@ export namespace Center
                 try{ resources.push( resource.toAux( caller ) ); }
                 catch( ex )
                 {
-                    if( (ex as Library.Error).status === Library.Error.status.unauthorized )
+                    if( (ex as Library.Error).status === Center.HttpServer.status.unauthorized )
                     {
                         // Ignore resources the caller is not authorized to access
                     }
@@ -183,6 +183,44 @@ export namespace Center
 
     export class HttpServer
     {
+        public static readonly status: Record<string, number> = 
+        {
+            ok: 200,
+            created: 201,
+            accepted: 202,
+            noContent: 204,
+            partialContent: 206,
+            movedPermanently: 301,
+            found: 302,
+            seeOther: 303,
+            notModified: 304,
+            temporaryRedirect: 307,
+            permanentRedirect: 308,
+            logicError: 400,
+            badRequest: 400,
+            unauthorized: 401,
+            forbidden: 403,
+            notFound: 404,
+            methodNotAllowed: 405,
+            notAcceptable: 406,
+            requestTimeout: 408,
+            conflict: 409,
+            gone: 410,
+            preconditionFailed: 412,
+            payloadTooLarge: 413,
+            uriTooLong: 414,
+            unsupportedMediaType: 415,
+            rangeNotSatisfiable: 416,
+            unprocessableContent: 422,
+            tooManyRequests: 429,
+            requestHeaderFieldsTooLarge: 431,
+            internalError: 500,
+            notImplemented: 501,
+            badGateway: 502,
+            serviceUnavailable: 503,
+            gatewayTimeout: 504
+        };
+
         private readonly _app: Express = express();
         private readonly _port: number;
         private _sessionMiddleware: RequestHandler;

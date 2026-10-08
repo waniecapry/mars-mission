@@ -75,7 +75,7 @@ describe( "Library utilities", () =>
     });
     test( "Given a Library error, when converted to auxiliary data, then its status is preserved", ()=>
     {
-        const error = new Library.Error( "Invalid resource", Library.Error.status.badRequest );
+        const error = new Library.Error( "Invalid resource", 400 );
 
         assert.equal( error.status, 400 );
         assert.equal( error.toAux().message, "Invalid resource" );

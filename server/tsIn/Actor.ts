@@ -37,7 +37,7 @@ export abstract class Actor
             if( row.role === Actor$Role.crew )
             {
                 if( crewMembers.size >= 3 )
-                    throw new Library.Error( "Cannot have more than 3 crew members", Library.Error.status.internalError );
+                    throw new Library.Error( "Cannot have more than 3 crew members", Center.HttpServer.status.internalError );
         
                 crewMembers.set( row.id, new Actor$Crew( row.id, row.name, row.email, row.salt, row.password ) );
             }
@@ -46,11 +46,11 @@ export abstract class Actor
                 const tier: Tier | undefined = Tier.tiers.get( (row as Actor$Passenger$AuxDb).tier );
             
                 if( !tier )
-                    throw new Library.Error( "Passenger has invalid tier", Library.Error.status.internalError );
+                    throw new Library.Error( "Passenger has invalid tier", Center.HttpServer.status.internalError );
         
                 passengerMembers.set( row.id, new Actor$Passenger( row.id, row.name, row.email, row.salt, row.password, tier ) );
             }
-            else throw new Library.Error( "Actor has invalid role", Library.Error.status.internalError );
+            else throw new Library.Error( "Actor has invalid role", Center.HttpServer.status.internalError );
         });
 
         Actor$Crew.members.clear();
@@ -65,17 +65,17 @@ export abstract class Actor
     public static async create( caller: Actor$Crew,role: Actor$Role, name: string, email: string, password: string, tier?: Tier ): Promise<Actor>
     {
         if( !(caller instanceof Actor$Crew) )
-            throw new Library.Error( "Only crew members can create other actors", Library.Error.status.unauthorized );
+            throw new Library.Error( "Only crew members can create other actors", Center.HttpServer.status.unauthorized );
         
         const normalizedEmail: string = email.toLowerCase().trim();
     
         if( !Library.EMAIL_REGEX.test( normalizedEmail ) )
-            throw new Library.Error( "Invalid email address", Library.Error.status.internalError );
+            throw new Library.Error( "Invalid email address", Center.HttpServer.status.internalError );
 
         if( role === Actor$Role.passenger )
         {
             if( !tier )
-                throw new Library.Error( "Passenger must have a tier", Library.Error.status.internalError );
+                throw new Library.Error( "Passenger must have a tier", Center.HttpServer.status.internalError );
 
             const salt: string = randomBytes( 16 ).toString( "hex" );
             const pass: string = Library.makeHash( password.trim(), salt );
@@ -102,7 +102,7 @@ export abstract class Actor
         else if( role === Actor$Role.crew )
         {
             if( Actor$Crew.members.size + Actor._pendingCrewCreations >= 3 )
-                throw new Library.Error( "Cannot create more than 3 crew members", Library.Error.status.internalError );
+                throw new Library.Error( "Cannot create more than 3 crew members", Center.HttpServer.status.internalError );
 
             ++Actor._pendingCrewCreations; // Increment pending crew creations to prevent race conditions
 
@@ -128,7 +128,7 @@ export abstract class Actor
             }
         }
 
-        throw new Library.Error( "Invalid role", Library.Error.status.internalError );
+        throw new Library.Error( "Invalid role", Center.HttpServer.status.internalError );
     }
     public static getByEmail( email: string ): Actor
     {
@@ -138,7 +138,7 @@ export abstract class Actor
             if( email === a.email )
                 return a;
 
-        throw new Library.Error( `User with email address ${email} is not found`, Library.Error.status.internalError );
+        throw new Library.Error( `User with email address ${email} is not found`, Center.HttpServer.status.internalError );
     }
 
     public constructor( id: Library.Identifier, name: string, role: Actor$Role, email: string, salt: string, password: string )
@@ -211,7 +211,7 @@ export class Actor$Passenger extends Actor
     public async setTier( caller: Actor, tier: Tier ): Promise<void>
     {
         if( !(caller instanceof Actor$Crew) )
-            throw new Library.Error( "Only crew members can set passenger tiers", Library.Error.status.unauthorized );
+            throw new Library.Error( "Only crew members can set passenger tiers", Center.HttpServer.status.unauthorized );
 
         await Center.getMySqlClient().execute
         (
