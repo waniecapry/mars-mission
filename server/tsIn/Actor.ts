@@ -53,6 +53,9 @@ export abstract class Actor
             else throw new Library.Error( "Actor has invalid role", Center.HttpServer.status.internalError );
         });
 
+        if( crewMembers.size !== 3 )
+            throw new Library.Error( "Exactly 3 crew members are required", Center.HttpServer.status.internalError );
+
         Actor$Crew.members.clear();
         Actor$Passenger.members.clear();
 
@@ -130,7 +133,7 @@ export abstract class Actor
 
         throw new Library.Error( "Invalid role", Center.HttpServer.status.internalError );
     }
-    public static getByEmail( email: string ): Actor
+    public static getByEmail( email: string ): Actor | undefined
     {
         const members: Actor[] = [...Actor$Crew.members.values(), ...Actor$Passenger.members.values()];
 
@@ -138,7 +141,7 @@ export abstract class Actor
             if( email === a.email )
                 return a;
 
-        throw new Library.Error( `User with email address ${email} is not found`, Center.HttpServer.status.internalError );
+        return undefined;
     }
 
     public constructor( id: Library.Identifier, name: string, role: Actor$Role, email: string, salt: string, password: string )

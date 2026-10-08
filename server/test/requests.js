@@ -93,6 +93,11 @@ test( "Vue API authenticates sessions and enforces passenger and crew permission
 
     assert.equal( (await request( "GET", "/i/session" )).status, 401 );
     assert.equal( (await request( "POST", "/login", { email: "ari@example.com", password: "wrong" } )).status, 401 );
+    assert.deepEqual
+    (
+        await request( "POST", "/login", { email: "unknown@example.com", password: "wrong" } ),
+        { status: 401, data: { error: "Invalid email or password" }, cookie: undefined }
+    );
     assert.equal( (await request( "POST", "/login", { email: "ari@example.com", password: "crew-pass" }, undefined, "http://evil.example" )).status, 403 );
 
     const passengerLogin = await request( "POST", "/login", { email: "MIRA@EXAMPLE.COM", password: "passenger-pass" }, undefined, base );

@@ -66,49 +66,39 @@ export function handleRequests( app: Application ): void
             }
         }
 
-        try
+        const body: unknown = req.body;
+
+        if( !body || typeof body !== "object" || Array.isArray( body ) )
         {
-            const body: unknown = req.body;
+            res.status( Center.HttpServer.status.badRequest ).json( { error: "Email and password are required" } );
 
-            if( !body || typeof body !== "object" || Array.isArray( body ) )
-            {
-                res.status( Center.HttpServer.status.badRequest ).json( { error: "Email and password are required" } );
-
-                return;
-            }
-
-            const { email, password } = body as Record<string, unknown>;
-
-            if( typeof email !== "string" || typeof password !== "string" || !email.trim() || !password )
-            {
-                res.status( Center.HttpServer.status.badRequest ).json( { error: "Email and password are required" } );
-
-                return;
-            }
-
-            const normalizedEmail: string = email.trim().toLowerCase();
-            const caller: Actor = Actor.getByEmail( normalizedEmail );
-
-            if( !caller || !caller.isValidPassword( password.trim() ) )
-            {
-                res.status( Center.HttpServer.status.unauthorized ).json( { error: "Invalid email or password" } );
-    
-                return;
-            }
-
-            req.session.userId = caller.id;
-            req.session.userRole = caller.role;
-            req.session.isAuthenticated = true;
-
-            res.json( Center.toAux( caller ) );
+            return;
         }
-        catch( ex )
+
+        const { email, password } = body as Record<string, unknown>;
+
+        if( typeof email !== "string" || typeof password !== "string" || !email.trim() || !password )
         {
-            if( ex instanceof Library.Error )
-                res.status( ex.status ).json( { error: ex.message } );
+            res.status( Center.HttpServer.status.badRequest ).json( { error: "Email and password are required" } );
 
-            else res.status( Center.HttpServer.status.internalError ).json( { error: (ex as any).message ?? "Something went wrong" } );
+            return;
         }
+
+        const normalizedEmail: string = email.trim().toLowerCase();
+        const caller: Actor | undefined = Actor.getByEmail( normalizedEmail );
+
+        if( !caller || !caller.isValidPassword( password.trim() ) )
+        {
+            res.status( Center.HttpServer.status.unauthorized ).json( { error: "Invalid email or password" } );
+
+            return;
+        }
+
+        req.session.userId = caller.id;
+        req.session.userRole = caller.role;
+        req.session.isAuthenticated = true;
+
+        res.json( Center.toAux( caller ) );
     });
     app.post( "/i/logout", async (req: Request, res: Response)=> // Logout from the system
     {

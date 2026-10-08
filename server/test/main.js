@@ -86,21 +86,38 @@ describe( "Library utilities", () =>
 
 describe( "Actor database loading", () =>
 {
-    test( "No rows leave both member maps empty", async t=>
+    test( "No crew members reject loading and leave both member maps empty", async t=>
     {
         Actor$Crew.members.clear();
         Actor$Passenger.members.clear();
         useClient( t, clientReturning( [] ) );
-        await Actor.initialise();
+        await assert.rejects( Actor.initialise(), error=>isStatus( 500 )( error ) && /Exactly 3 crew members/.test( error.message ) );
         assert.equal( Actor$Crew.members.size, 0 );
         assert.equal( Actor$Passenger.members.size, 0 );
     });
-    test( "Crew rows are available by ID", async t=>
+    for( const count of [1, 2] )
+    {
+        test( `Loading rejects ${count} crew member${count === 1 ? "" : "s"}`, async t=>
+        {
+            Actor$Crew.members.clear();
+            t.after( ()=>Actor$Crew.members.clear() );
+
+            const rows = [1, 2, 3].slice( 0, count ).map( id=>({ id: `c${id}`, role: Actor$Role.crew, name: "Crew", email: `c${id}@example.com`, salt: "s", password: "h" }) );
+
+            useClient( t, clientReturning( rows ) );
+            await assert.rejects( Actor.initialise(), isStatus( 500 ) );
+            assert.equal( Actor$Crew.members.size, 0 );
+        });
+    }
+    test( "Exactly three crew rows are available by ID", async t=>
     {
         Actor$Crew.members.clear();
-        useClient( t, clientReturning( [{ id: "c1", role: Actor$Role.crew, name: "Bo", email: "bo@example.com", salt: "s", password: "h" }] ) );
+        const rows = [1, 2, 3].map( id=>({ id: `c${id}`, role: Actor$Role.crew, name: id === 1 ? "Bo" : "Crew", email: `c${id}@example.com`, salt: "s", password: "h" }) );
+
+        useClient( t, clientReturning( rows ) );
         await Actor.initialise();
         assert.equal( Actor$Crew.members.get( "c1" ).name, "Bo" );
+        assert.equal( Actor$Crew.members.size, 3 );
         t.after( ()=>Actor$Crew.members.clear() );
     });
     test( "Loaded passengers have a usable tier", async t=>
@@ -110,7 +127,9 @@ describe( "Actor database loading", () =>
     
         await Tier.initialise( {} );
     
-        useClient( t, clientReturning( [{ id: "p1", role: Actor$Role.passenger, name: "Mira", email: "mira@example.com", salt: "s", password: "h", tier: Tier$Level.Gold }] ) );
+        const crewRows = [1, 2, 3].map( id=>({ id: `c${id}`, role: Actor$Role.crew, name: "Crew", email: `c${id}@example.com`, salt: "s", password: "h" }) );
+
+        useClient( t, clientReturning( [...crewRows, { id: "p1", role: Actor$Role.passenger, name: "Mira", email: "mira@example.com", salt: "s", password: "h", tier: Tier$Level.Gold }] ) );
         
         await Actor.initialise();
     
@@ -118,6 +137,7 @@ describe( "Actor database loading", () =>
 
         assert.equal( loaded.toAux().tier, Tier$Level.Gold );
         assert.equal( loaded.hasPermission( new Resource( "r1", 1, Resource$Status.Active, "Food", "", Tier.tiers.get( Tier$Level.Silver ) ) ), true );
+        t.after( ()=>Actor$Crew.members.clear() );
     });
     test( "Unknown actor roles reject loading", async t=>
     {
