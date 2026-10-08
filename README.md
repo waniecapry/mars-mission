@@ -7,7 +7,11 @@
 
 ## Server setup
 
-Run `npm install`, `npm test`, and `npm start` from the `server` directory. The server reads `server/data.env` and requires `DB_HOST`, `DB_USER`, `DB_NAME`, `PORT`, and `SESSION_SECRET`. `DB_PORT` defaults to 3306, and `DB_PASSWORD` defaults to an empty string.
+From the project root, run `./initialise-environtment.sh` to install server dependencies and set up a fresh MySQL database. It prompts for the MySQL username, host, and password, runs `server/setup-mySql.sql` through the MySQL client, then calls `setup.js` to add three Crew Leads, three passengers (one per tier), and the resources. The port defaults to `3306`; set `MYSQL_PORT` in the shell to override it. The SQL script refuses to create an existing `marsMission` database. After the inserts commit, generated login details are saved in the private, Git-ignored `credentials.json` file. The seven initial resource rows correspond to the Silver, Gold, and Platinum facilities in the specification; their `type` is `0` because the specification does not define type codes.
+
+After setup, configure `server/data.env` with `DB_NAME=marsMission` and the same host, user, and password (or credentials for a MySQL user with access to that database).
+
+Run `npm test` and `npm start` from the `server` directory. The server reads `server/data.env` and requires `DB_HOST`, `DB_USER`, `DB_NAME`, `PORT`, and `SESSION_SECRET`. `DB_PORT` defaults to 3306, and `DB_PASSWORD` defaults to an empty string.
 
 Sessions use the same MySQL settings unless `SESSION_STORE_HOST`, `SESSION_STORE_PORT`, `SESSION_STORE_DATABASE`, `SESSION_STORE_USER`, or `SESSION_STORE_PASS` are provided. Set `FRONT_END_ORIGIN` when the frontend runs on another origin and needs credentialed CORS requests.
 
