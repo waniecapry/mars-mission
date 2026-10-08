@@ -126,5 +126,5 @@ test( "Vue API authenticates sessions and enforces passenger and crew permission
     assert.equal( (await request( "GET", "/i/session", undefined, crewLogin.cookie )).data.actor.id, crew.id );
     assert.equal( (await request( "POST", "/i/logout", undefined, crewLogin.cookie )).status, 204 );
     assert.equal( (await request( "GET", "/i/session", undefined, crewLogin.cookie )).status, 401 );
-    assert.equal( (await request( "GET", "/i/unknown" )).status, 404 );
+    assert.equal( (await request( "GET", "/i/unknown" )).status, 401 );
 });

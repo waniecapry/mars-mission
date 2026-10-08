@@ -133,7 +133,7 @@ export function handleRequests( app: Application ): void
     {
         if( req.session.userRole !== Actor$Role.crew || !Actor$Crew.members.get( req.session.userId! ) )
         {
-            res.status( Center.HttpServer.status.unauthorized ).json( { error: "Unauthorised" } );
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Unauthorised" } );
         
             return;
         }
@@ -144,7 +144,7 @@ export function handleRequests( app: Application ): void
     {
         if( req.session.userRole !== Actor$Role.crew )
         {
-            res.status( Center.HttpServer.status.unauthorized ).json( { error: "Unauthorised" } );
+            res.status( Center.HttpServer.status.forbidden ).json( { error: "Unauthorised" } );
         
             return;
         }
