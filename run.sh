@@ -6,4 +6,4 @@ set -o nounset                        # Exit when undeclared variables are used.
 
 npm run build --prefix public
 
-npm start
+npm start --prefix server
