@@ -4,183 +4,2523 @@
 
 :root
 {
-    --paxa-primary-colour: rgb(36 94 80);
-    --paxa-muted-colour: rgb(117 129 123);
-    --paxa-border-colour: rgb(229 233 226);
+    --paxa-primary-colour: rgb(36 58 181);
+    --paxa-rouge: rgb(108 0 0);
+    --paxa-green: rgb(0 128 0);
 }
 
 /***********************************************************************************
     General
 ***********************************************************************************/
 
-:root
-{
-    background: rgb(247 248 245);
-    color: rgb(37 59 54);
-    font-family: "DM Sans", sans-serif;
-    font-synthesis: none;
-}
 *
 {
     box-sizing: border-box;
 }
+::placeholder
+{
+    font-weight: normal;
+}
 body
 {
+    font-family: sans-serif;
+    font-size: 10.2pt;
+    line-height: 1;
     margin: 0;
+    overflow: hidden;
 }
-button,
-input
+hr
 {
-    font: inherit;
+    background-color: gainsboro;
+    border-style: none;
+    height: 1px;
 }
-button
+.smart-table.smart-table tr[row-id] td
 {
-    cursor: pointer;
-}
-button:disabled
-{
-    cursor: default;
-    opacity: 0.48;
-}
-:focus-visible
-{
-    outline: 3px solid rgb(135 182 163);
-    outline-offset: 3px;
-}
-h1,
-h2,
-p
-{
-    margin-top: 0;
-}
-h1,
-h2
-{
-    font-family: "Manrope", sans-serif;
+    white-space: unset;
 }
 
 /***********************************************************************************
-    Text
+    Header
 ***********************************************************************************/
 
-.muted
+body>header
 {
-    color: var(--paxa-muted-colour);
-    font-size: 13px;
-    line-height: 1.8;
+    /*
+        Targets >> The header of the main page
+
+        To make the header's background white.
+    */
+
+    background-color: rgba(252,252,252,0.96);
+    left: 0;
+    max-height: 100px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 1030;
 }
-.eyebrow
+body>header>a:first-child
 {
-    color: rgb(123 139 126);
+    /*
+        Targets >> The logo and signage of the header
+
+        Puts a border to the right side.
+    */
+
+    border-right: 1px solid rgb(238, 238, 238);
+}
+body>header>a:first-child:hover 
+{
+    /*
+        Targets >> The logo and signage of the header
+
+        Changes the background colour when hovering over the logo and signage.
+    */
+
+    background-color: rgb(213, 212, 222);
+}
+body>header>a:first-child span>img:first-child
+{
+    /*
+        Targets >> First child of the img element in the span element
+
+        Sizing an image to have specific size.
+    */
+
+    vertical-align: middle;
+    width: 1.516em;
+}
+body>header>a:first-child>span:last-child>img:last-child
+{
+    /*
+        Targets >> The img element sourcing an signage image
+
+        Specifies its specific width.
+    */
+
+    vertical-align: middle;
+    width: 150px;
+}
+body>header a
+{
+    /*
+        Targets >> The logo and name of the user menu
+
+        Removes underline which parts of anchor element.
+    */
+
+    color: inherit;
+    text-decoration: none;
+}
+body>header>nav
+{
+    /*
+        Targets >> The nav element in the header
+
+        Turns the text insertion cursor into a pointing cursor of all elements inside the nav element.
+    */
+
+    cursor: default;
+}
+body>header>nav>h1
+{
+    float: left;
+    font-size: inherit;
+    font-weight: normal;
+    margin: 0;
+    padding-left: 15px;
+    padding-top: 15px;
+}
+body>header>nav>div>ul li a>span>img
+{
+    /*
+        Targets >> The img element in the a element having the parent of class named dropdown
+
+        Specifies the size for all of the img element that is in the li elements which contain the anchor element having an img element wrap by the span element.
+    */
+
+    vertical-align: middle;
+    width: 1em;
+}
+body>header>nav>div>ul>li.dropdown>ul>li>div:last-child
+{
+    /*
+        Targets >> The div element containing the user info
+
+        To align the name and email text in the middle of the logo.
+    */
+
+    align-items: center;
+    border-bottom: 2px solid rgb(238, 238, 238);
+    display: flex;
+    padding: 1em;
+    margin-bottom: 0.5em;
+}
+body>header>nav#navig>div>ul>li>ul.dropDownMenu
+{
+    /*
+        Targets >> The ul element of dropdown menu
+
+        To make the width of the dropdown menu follows the text length.
+    */
+
+	display: none;
+	background-color: rgb(255, 255, 255);
+	border: 1px solid rgb(228, 223, 223);
+	box-shadow: none;
+	padding: 5px 0;
+	border-color: rgb(238, 238, 238);
+	list-style: none;
+	left: auto;
+    min-width: 280px;
+	position: absolute;
+    right: 0;
+	text-align: left;
+	top: 100%;
+    width: auto;
+	z-index: 1000;
+}
+body>header>nav#navig>div>ul>li.dropdown.open>ul.dropDownMenu
+{
     display: block;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-    margin-bottom: 13px;
+}
+body>header>nav#navig>div>ul>li.dropdown.open>ul.dropDownMenu>li .menu
+{
+	list-style: none;
+	margin: 0;
+	max-height: 200px;
+	overflow-x: hidden;
+	padding: 0;
+}
+body>header>nav#navig>div>ul>li.dropdown.open>ul.dropDownMenu>li .menu>li>a 
+{
+	border-bottom: 1px solid rgb(244, 244, 244);
+	color: rgb(68, 68, 68);
+    display: block;
+	overflow: hidden;
+	padding: 10px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+body>header>nav>div>ul>li>ul>li>div:last-child>img
+{
+    /*
+        Targets >> The img element which is the logo for dropdown menu
+
+        Specifies the image size.
+    */
+
+    width: 4em;
+}
+body>header>nav>div>ul>li>ul>li>div:last-child>div
+{
+    /*
+        Targets >> The div element having the img element as sibling
+
+        To push the img element to the left side so that it can have space between the logo element.
+    */
+
+    margin-left: 0.8em;
+}
+body>header>nav>div>ul>li>ul>li>div:last-child>div>small
+{
+    /*
+        Targets >> The small element containing a text of the user email
+
+        Changes the colour of the text.
+    */
+
+    color: rgb(105, 105, 105);
+}
+body>header>nav>div li:last-child>ul>li button, 
+body>header>nav>div li:last-child>ul>li a
+{
+    /*
+        Targets >> Target all the button and anchor elements of the dropdown menu
+
+        Change the appearance of the elements.
+    */
+
+    background-color: transparent;
+    border: none;
+    display: block;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.5em 0 1em 1.3em;
+}
+body>header>nav>div li:last-child>ul>li:last-child a
+{
+    /*
+        Targets >> The anchor elements of the dropdown menu specific for sign out
+
+        Changes the text appearance of the sign out text.
+    */
+
+    color:black;
+    font-weight: bold;
+}
+body>header>nav>div li:last-child>ul>li a:hover
+{
+    /*
+        Targets >> The anchor elements of the dropdown menu specific for sign out
+
+        Changes the colour of the sign out when hovering.
+    */
+
+    background-color: transparent;
+}
+
+/***********************************************************************************
+    The Side Bar
+***********************************************************************************/
+
+body>aside
+{
+    /*
+        Targets >> The aside elements for the side bar
+
+        Changes the colour and pointer type of the aside element. 
+    */
+
+    background-color: whitesmoke;
+    background-image: url("sideBarBg.svg");
+    background-position: 0 52px;
+    background-repeat: no-repeat;
+    background-size: 100% 98%;
+    bottom: 0;
+    box-shadow: 0 0 4px darkgray;
+    left: 0;
+    overflow: auto;
+    padding-bottom: 4em;
+    padding-top: 48px;
+    position: fixed;
+    top: 0;
+    width: 230px;
+    z-index: 810;
+}
+body>aside>section
+{
+    /*
+        Targets >> The aside element containing the section
+
+        Specifies a padding at top among all the sections. 
+    */
+
+    padding-top:1em;
+}
+body>aside ul>li>a
+{
+    cursor: pointer;
+    text-decoration: none;
+}
+body>aside ul>li:hover>a
+{
+    /*
+        Targets >> The anchor element of the sidebar
+
+        assigns a color to the li elements when hovering
+    */
+
+    background-color: rgba(30, 40, 44, 0.2);
+}
+body>aside ul>li>a>img,
+body>aside ul>li>a>i.fa
+{
+    filter: grayscale(0.4);
+    height: 1.4em;
+    margin-right: 0.6em;
+}
+body>aside ul>li>a:hover>img,
+body>aside ul>li>a:hover>i.fa
+{
+    filter: grayscale(0);
+}
+
+/***********************************************************************************
+    Content Wrapper
+***********************************************************************************/
+
+body>div#content-wrapper
+{
+    background-color: rgba(254,254,254,0.96);
+    border-top: 1px solid darkgray; 
+    bottom: 0; 
+    left: 230px; 
+    margin: 0; 
+    overflow: scroll; 
+    padding: 0; 
+    position: fixed; 
+    right: 0; 
+    top: 50px; 
+}
+body>div#content-wrapper>*
+{
+    display: none;
+}
+body>div#content-wrapper>:last-child
+{
+    display: block;
+}
+body>div#content-wrapper>section
+{
+    /*
+        Targets >> The section element in the div element with the id of content-wrappers
+
+        To give a padding to the section to gap a space between  the dashboard and sidebar.
+    */
+
+    height: 100%;
+    padding: 1.2em;
+}
+body>div#content-wrapper>section.unpadded
+{
+    padding: 0;
+}
+
+/***********************************************************************************
+    Tables
+***********************************************************************************/
+
+table
+{
+    max-width: 99.8%;
+    width: 99.8%;
+}
+table.justifiedHeader>thead>tr>th
+{
+    text-align: justify;
+}
+.paxa table.tabularListing tbody td,
+.paxa table.tabular-listing tbody td
+{
+    padding-bottom: 1em;
+    vertical-align: top;
+}
+.paxa table.tabularListing tbody td:first-child,
+.paxa table.tabular-listing tbody td:first-child
+{
+    max-width: 6em;
+    padding-right: 2em;
+}
+.paxa table.tabularListing tbody .expandedHorizontally,
+.paxa table.tabular-listing tbody .expanded-horizontally
+{
+    width: 100%;
 }
 
 /***********************************************************************************
     Buttons
 ***********************************************************************************/
 
-.button
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .jsoneditor button, .jodit button, .e-btn, div[data-role='calendar'] button),
+.paxa a.button
 {
-    align-items: center;
+    /*
+        Targets >> All button elements under the class .paxa
+
+        The default style for button elements except those under #Container, .smart-button.
+    */
+
+    background-color: var(--paxa-primary-colour);
+    border: none;
+    border-radius: 5em;
+    color: rgb(249 250 252);
+    font-size: inherit;
+    font-weight: normal;
+    padding: 0.34em 0.48em 0.32em 0.48em;
+}
+.paxa a.button
+{
+    text-decoration: none;
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .jsoneditor button, .jodit button, .e-btn, div[data-role='calendar'] button)>img
+{
+    width: 1.2em;
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .jsoneditor button, .jodit button, .e-btn, div[data-role='calendar'] button):hover
+{
+    /*
+        Targets >> All button elements under the class .paxa
+
+        To apply a hover effect for default button elements except those under #Container, .smart-button.
+    */
+
+    background-color: rgb(25 58 92);
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).rouge
+{
+    background-color: rgb(128 0 0);
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).rouge:hover
+{
+    background-color: rgb(108 0 0);
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).light
+{
+    /*
+        Targets >> All button elements under the class .paxa
+
+        To style button elements with class .light except those under #Container, .smart-button.
+    */
+
+    background-color: rgb(244 244 252);
+    box-shadow: 1px 1px 1px 1px rgb(210 210 230);
+    color: rgb(36 58 178);
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).light:hover
+{
+    /*
+        Targets >> All button elements under the class .paxa
+
+        To apply a hover effect for button elements with class .light except those under #Container, .smart-button.
+    */
+
+    background-color: rgb(224 224 232);
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).bright
+{
+    background-color: white;
+    border: 1px solid var(--paxa-primary-colour);
+    color: var(--paxa-primary-colour);
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).bright:hover
+{
+    background-color: lavender;
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).unadorned,
+.unadorned button:not(#Container button, .exclude-paxa, .smart-button, .e-btn)
+{
+    background-color: transparent;
+    color: inherit;
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).unadorned:hover,
+.unadorned button:not(#Container button, .exclude-paxa, .smart-button, .e-btn):hover
+{
+    background-color: rgb(206, 206, 223);
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn)>i.fa
+{
+    /*
+        Targets >> All <i> elements with the class .fa that are direct descendants of button elements that within the class .paxa
+        
+        To apply height and width to <i> elements with class .fa except those under #Container and .smart-button.
+    */
+
+    color:  rgb(250, 250, 250);
+    height: 1em;
+    width: 1.5em;
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn)>i.fa+span
+{
+    /*
+        Targets >> All <span> elements that is the next sibling of <i> elements with the class .fa, that are direct descendants of button elements that within the class .paxa
+        
+        To apply height and width to <span> elements with class .fa except those under #Container and .smart-button.
+
+        Note: For developers in the future use, if the need to change the <span> style arise.
+    */
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).light>i.fa
+{
+    /*
+        Targets >> All <i> elements with the class .fa that are direct descendants of button with the class .light elements that within the class .paxa
+
+        To apply color to <i> elements with class .fa except those under #Container and .smart-button.
+    */
+
+    color: rgb(36 58 181);
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).bright>i.fa
+{
+    color: var(--paxa-primary-colour);
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).unadorned>i.fa,
+.unadorned button:not(#Container button, .exclude-paxa, .smart-button, .e-btn)>i.fa
+{
+    color:  inherit;
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).x
+{
+    background-color: transparent;
+    padding: 0;
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).x::after
+{
+    color: rgb(128 0 0);
+    content: "×";
+    font-size: 1.4em;
+    font-weight: bold;
+}
+.paxa button:not(#Container button, .exclude-paxa, .smart-button, .e-btn).x:hover
+{
+    opacity: 0.68;
+}
+.paxa a.button:hover
+{
+    /*
+        Targets >> All <a> elements under the class .paxa
+
+        To apply a hover effect for default <a> elements except those under #Container, .smart-table and .smart-tree.
+    */
+
+    background-color: rgb(25, 58, 92);
+}
+.paxa a.button.light
+{
+    /*
+        Targets >> All <a> elements under the class .paxa
+
+        To style <a> elements with class .light except those under #Container, .smart-table and .smart-tree.
+    */
+
+    background-color: rgb(244, 244, 252);
+    box-shadow: 2px 2px 3px rgb(181, 181, 192);
+    color: rgb(36, 58, 181);
+}
+.paxa a.button.light:hover
+{
+    /*
+        Targets >> All <a> elements under the class .paxa
+
+        To apply a hover effect for <a> elements with class .light except those under #Container, .smart-table and .smart-tree.
+    */
+
+    background-color: rgb(224 224 232);
+}
+.paxa a:not(#Container a, .smart-table a, .smart-tree a)>i.fa
+{
+    /*
+        Targets >> All <i> elements with the class .fa that are direct descendants of button elements that within the class .paxa
+        
+        To apply height and width to <i> elements with class .fa except those under #Container, .smart-table and .smart-tree.
+    */
+
+    height: 1em;
+    width: 1.5em;
+}
+.paxa a:not(#Container a, .smart-table a, .smart-tree a).light>i.fa
+{
+    text-align: center;
+}
+.paxa textarea:not(#Container textarea, .exclude-paxa, .smart-textarea)
+{
+    /*
+        Targets >> All textarea elements under the class .paxa
+
+        The default style for textarea elements except those under #Container.
+    */
+
+    background-color: rgb(250, 252, 255);
     border: 1px solid transparent;
-    border-radius: 7px;
-    display: inline-flex;
-    font-size: 12px;
-    font-weight: 600;
-    gap: 15px;
-    justify-content: center;
-    min-height: 43px;
-    padding: 12px 17px;
+    border-radius: 6px;
+    box-shadow: 1px 1px 1px 1px rgb(210, 210, 230);
+    outline: none;
+    padding: 0.6em;
 }
-.button-primary
+.paxa input:not(#Container input, .exclude-paxa,.filter-value, .smart-input, .smart-filter-input, .jsoneditor input, .e-input, .e-multiselect *, ul.atmosphere.tree input),
+.paxa select:not(#Container select, .exclude-paxa, .smart-select)
 {
-    background: var(--paxa-primary-colour);
-    color: white;
+    border: 1px solid transparent;
+    border-radius: 5em;
+    box-shadow: 1px 1px 1px 1px rgb(210, 210, 230);
+    outline: none;
+    padding: 0.6em;
+    padding-bottom: 0.32em;
 }
-.button-primary:hover:not(:disabled)
+.paxa input:not(#Container input, .exclude-paxa, .filter-value, .smart-input, .smart-filter-input, .e-dropdownbase, .e-input, ul.atmosphere.tree input):focus, 
+.paxa textarea:not(#Container textarea, .exclude-paxa, .smart-textarea):focus, 
+.paxa select:not(#Container select, .exclude-paxa, .smart-select):focus
 {
-    background: rgb(22 70 56);
+    /*
+        Targets >> All input, textarea and select elements under the class .paxa
+
+        The default style for input, textarea and select elements when they are in focus except those under #Container, .smart-input.
+    */
+
+    background-color: rgb(255, 255, 255);
+    border-color:  rgb(36, 58, 181);
+    box-shadow: 1px 1px 1px rgb(36, 58, 181);
 }
-.button-secondary
+.paxa input:not(#Container input, .exclude-paxa, .filter-value, .smart-input, .smart-filter-input, ul.atmosphere.tree input):disabled, 
+.paxa textarea:not(#Container textarea, .exclude-paxa, .smart-textarea):disabled, 
+.paxa select:not(#Container select, .exclude-paxa, .smart-select):disabled,
+.paxa button:not(#Container button, .smart-button):disabled
 {
-    background: white;
-    border-color: rgb(223 229 221);
-    color: rgb(69 94 77);
+    /*
+        Targets >> All input elements with the class .disabledInput within elements with the class .paxa.
+        
+        To apply opacity and cursor styles to disabled input elements within elements with the class .paxa.
+    */
+
+    cursor: not-allowed;
+    opacity: 0.4;
 }
-.button-secondary:hover:not(:disabled)
+.paxa input[type="checkbox"]:not(#Container input[type="checkbox"], .smart-table input[type="checkbox"], .smart-tree input[type="checkbox"], 
+ul.atmosphere.tree input[type="checkbox"])
 {
-    background: rgb(237 242 233);
+    /*
+        Targets >> All input type=checkbox under the class .paxa
+
+        The default style for input type=checkbox elements except those under #Container, .smart-table and .smart-tree.
+    */
+
+    box-shadow: 0 0 0;
+}
+.paxa input[type="file"]:not(#Container input[type="file"], .smart-table input[type="file"], .smart-tree input[type="file"])
+{
+    border-radius: 4px;
+}
+.paxa label>input[type="radio"]:not(#Container input[type="radio"], .smart-table input[type="radio"], .smart-tree input[type="radio"])
+{
+    /*
+        Targets >> Input elements type radio inside <label> elements under the class .paxa,
+
+        Applies a box-shadow and right margin to radio input except those under #Container, .smart-table, and .smart-tree.
+    */
+
+    box-shadow: 0 0 0;
+    margin-right: 0.5em;
+}
+.paxa input[type="text"]:not(#Container input, .filter-value, .smart-input, .smart-filter-input, .e-dropdownbase, .e-input, ul.atmosphere.tree input).ingraft
+{
+    background: transparent;
+    box-shadow: none;
+    outline: none;
+}
+.paxa input[type="color"]:not(#Container input[type="color"], .smart-table input[type="color"], .smart-tree input[type="color"])
+{
+    box-shadow: none;
+    border-style: none;
+    background-color: transparent;
+    padding: 0;
+}
+.paxa input[type="text"].ingraft:hover,
+.paxa input[type="text"].ingraft:focus
+{
+    background-color: rgb(240 240 240/0.94);
+}
+.paxa .labelInput
+{
+    /*
+        Targets >> All class .div.labelInput elements within the class .paxa.
+
+        To apply margin-top, margin-bottom, and align-items styles to class .labelInput elements with the class .paxa.
+    */
+
+    align-items: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.paxa .labelInput>label
+{
+    /*
+        Targets >> All label elements within div.labelInput elements within the class .paxa.
+    
+        To apply display and align-items styles to label elements within div.labelInput elements with the class .paxa.  
+    */
+
+    align-items: center;
+    display: flex;
+}
+.paxa div.labelInput>label>span:first-child
+{
+    /*
+        Targets >> The first `span` element within label elements of `div.labelInput` elements with the class .paxa.
+    
+        To align the first span element within label elements in class .paxa.
+    */
+
+    display: inline-block;
+    width: 13em;
+}
+.paxa .disabledInput
+{
+    /*
+        Targets >> All input elements with the class .disabledInput within elements with the class .paxa.
+        
+        To apply opacity and cursor styles to disabled input elements within elements with the class .paxa.
+    */
+    
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+.paxa .table>thead>tr>th
+{
+    /*
+        Targets >> All table headers (<th>) within class .tables within the class .paxa.
+        
+        To override the Bootstrap style to vertically align the content of table headers (<th>) in the middle.
+    */
+    
+    vertical-align: middle;
+}
+.paxa smart-table table>thead>tr>th>div.wrapper /* To increase the specifity of the CSS rule as AdminLTE will overwrite this style. */
+{
+    /*
+        Targets >> The <div> with .wrapper that is direct descendant of <th>. <th> must be direct descendant of <tr> that is also direct descendant of 
+        <thead> under the <table> that is descendant of <smart-table> 
+        
+        By default, <smart-table> gives black color to the <div> background, this rule is to overwrite and give white color to the background instead.
+    */
+
+    background-color: white;
 }
 
 /***********************************************************************************
-    Layout
+    Windows
 ***********************************************************************************/
 
-.workspace
+.paxa.smart-window
+{
+    border-radius: 1em;
+}
+.paxa.smart-window:focus, .paxa.smart-window[focus]
+{
+    border-color: rgb(36, 58, 181);
+    border-width: 3px;
+}
+.paxa.smart-window.auto
+{
+    height: auto;
+    width: auto;
+}
+.paxa.smart-window .smart-content-container>div.smart-header-section
+{
+    background-color: rgb(36, 58, 181);
+    color: rgb(250, 250, 250);
+    height: 2.2em;
+    min-height: 0;
+}
+.paxa.smart-window .smart-content-container>.smart-footer
+{
+    background-color: rgb(238, 238, 238);
+}
+.paxa.smart-window .smart-content-container>.smart-content
+{
+    align-items: start;
+    padding-left: 2em;
+    padding-right: 2em;
+}
+
+/***********************************************************************************
+    Selection Controls
+***********************************************************************************/
+
+div.selection-controls
+{
+    display: grid;
+    gap: 0.8em;
+}
+div.selection-controls.horizontal
+{
+    display: flex;
+    flex-direction: row;
+}
+div.selection-controls label:has(input[type="radio"]),
+div.selection-controls label:has(input[type="checkbox"])
+{
+    align-items: center;
+    background-color: rgb(244 244 252);
+    border-radius: 1.8em;
+    box-shadow: 1px 1px 1px 1px rgb(210 210 230);
+    color: var(--paxa-primary-colour);
+    cursor: pointer;
+    display: flex;
+    padding: 4px 0.6em 2px 0.6em;
+}
+div.selection-controls label:has(input[type="radio"]):hover,
+div.selection-controls label:has(input[type="checkbox"]):hover
+{
+    background-color: rgb(224 224 232);
+}
+div.selection-controls label input[type="radio"],
+div.selection-controls label input[type="checkbox"]
+{
+    margin: 0 0.8em 0 0;
+}
+div.selection-controls label:has(input[type="radio"]:checked),
+div.selection-controls label:has(input[type="checkbox"]:checked)
+{
+    background-color: rgb(218, 218, 255);
+}
+div.selection-controls label>img
+{
+    width: 1.8em;
+}
+
+label.checkbox
+{
+    align-items: center;
+    background-color: rgb(244, 244, 252);
+    border-radius: 5em;
+    color: rgb(36, 58, 181);
+    cursor: pointer;
+    display: inline-flex;
+    padding: 0.5em;
+}
+label.checkbox input[type="checkbox"]
+{
+    display: none;
+}
+label.checkbox:has(input[type="checkbox"]):before 
+{
+    background-color: white;
+    border: thin solid rgb(36, 58, 181);
+    border-radius: 50%;
+    content: '';
+    display: inline-block;
+    height: 0.6em;
+    margin-right: 0.3em;
+    width: 0.6em;
+}
+label.checkbox:has(input[type="checkbox"]:hover):before
+{
+    background-color: rgb(197, 215, 236);
+}
+label.checkbox:has(input[type="checkbox"]:checked):before
+{
+    background-color: rgb(36, 58, 181);
+}
+.smart-tree
 {
     /*
-        Targets >> The authenticated workspace
-
-        Reserve a column for the side bar and allow the main content to fill the remaining space.
+        Targets >> All elements with the class .smart-tree.
     */
 
-    display: grid;
-    grid-template-columns: 225px minmax(0, 1fr);
-    min-height: 100dvh;
+    --smart-tree-lines-color: rgb(0, 0, 0);
 }
-.main-content
+.smart-menu 
 {
-    margin: 0 auto;
-    max-width: 1600px;
-    padding: 0 40px;
+    /*
+        Targets >> All elements with the class .smart-menu.
+    */
+
+    --smart-menu-vertical-default-width: auto;
+    --smart-menu-vertical-default-height: auto;
+}
+section.auiScriptor>div:nth-child(1), section.auiTemplater>div:nth-child(1)
+{
+    /*
+        Targets >> Div that contains button "Add"
+    */
+
+    margin-bottom: 2em;
+}
+section.auiScriptor>div:nth-child(1)>button, section.auiTemplater>div:nth-child(1)>button
+{
+    /*
+        Targets >> Button "Add"
+
+        To make it appear at the right side of window
+    */
+
+    float: right;
+}
+section.auiScriptor>ul, section.auiTemplater>ul
+{
+    /*
+        Targets >> <ul> element inside the section
+
+        To position the element at the left side, add margin and padding, and limit width
+    */
+
+    float: left;
+    margin-right: 3em;
+    padding-left: 0em;
+    width: 25%;
+}
+section.auiScriptor>ul>li, section.auiTemplater>ul>li
+{
+    /*
+        Targets >> List item
+
+        To add some visual styling to the element
+    */
+
+    border-radius: 10px;
+    list-style-type: none;
+    padding: 0.4em;
+    margin-bottom: 1em;
+    word-wrap: break-word;
+}
+section.auiScriptor>ul>li:hover, section.auiTemplater>ul>li:hover
+{
+    /*
+        Targets >> List item on hover state
+
+        To change the cursor type when hovering over the element
+    */
+
+    cursor: pointer;
+}
+section.auiScriptor>ul>li[data-type="builtIn"]
+{
+    /*
+        Targets >> List item for built in script
+
+        To change the background and font colour
+    */
+
+    background-color: rgb(230, 230, 230);
+    border: 0.1px solid rgb(181, 181, 192);
+    box-shadow: 2px 2px 3px rgb(181, 181, 192);
+    color: rgb(0, 0, 0);
+}
+section.auiScriptor>ul>li[data-type="custom"], section.auiTemplater>ul>li
+{
+    /*
+        Targets >> List item for custom script
+
+        To change the background and font colour
+    */
+
+    background-color: rgb(255, 255, 255);
+    border: 0.1px solid rgb(255, 255, 255);
+    box-shadow: 2px 2px 3px rgb(181, 181, 192);
+    color: rgb(0, 0, 0);
+}
+section.auiScriptor>div:nth-child(3), section.auiTemplater>div:nth-child(3)
+{
+    /*
+        Targets >> Third div in virtualScriptor section
+
+        To make its sibling div appear side by side, set its height and limit width
+    */
+
+    display: inline-block;
+    height: 90%;
+    width: 70%;
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(3), section.auiScriptor>div:nth-child(3)>div:nth-child(4) 
+{
+    /*
+        Targets >> Third and fourth div inside the third div
+
+        To add margin between divs
+    */
+
+    margin-bottom: 2em;
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(3) input
+{
+    /*
+        Targets >> Input for name
+
+        To add margin between input and label
+    */
+
+    margin-left: 2em;
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(4)
+{
+    /*
+        Targets >> Div that is used for "jsonEditor"
+
+        To specifiy the size of the jsonEditor's text area.
+        The text area's div will fill the parent's width and and occupy 70% of the parent's height.
+    */
+
+    width: 100%;
+    height: 70%;
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(4)>div.jsoneditor
+{
+    /*
+        Targets >> jsoneditor inside aui scriptor section
+    */
+
+    border: thin solid rgb(59, 48, 155);
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(4) .jsoneditor-menu
+{
+    /*
+        Targets >> Header for the jsonEditor
+
+        To change the background and border colour
+    */
+
+    background-color: rgb(59, 48, 155);
+    border-bottom: 1px solid rgb(59, 48, 155);
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(4) .jsoneditor-contextmenu .jsoneditor-text
+{
+    /*
+        Targets >> Text in jsonEditor context menu
+    */
+
+    color: rgb(255, 255, 255);
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(4) .jsoneditor-contextmenu li button.jsoneditor-selected
+{
+    /*
+        Targets >> Button inside the jsonEditor context menu for the currently selected mode
+    */
+
+    background-color: rgb(46, 91, 200);
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(4) .jsoneditor-contextmenu li button:hover
+{
+    /*
+        Targets >> Buttons inside the jsonEditor context menu
+
+        To change the background colour on mouse hover
+    */
+
+    background-color: rgb(89, 94, 167);
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(4) .jsoneditor-menu a.jsoneditor-poweredBy,
+section.auiScriptor>div:nth-child(3)>div:nth-child(4) .jsoneditor-menu .jsoneditor-sort,
+section.auiScriptor>div:nth-child(3)>div:nth-child(4) .jsoneditor-menu .jsoneditor-transform,
+section.auiTemplater>div:nth-child(3) .jodit-status-bar .jodit-status-bar-link
+{
+    /*
+        Targets >> Sort button, transform button and powered by Ace link inside jsonEditor that is unnecessary
+    */
+
+    display: none;
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(5), section.auiTemplater>div:nth-child(3)>div:nth-child(3)
+{
+    /*
+        Targets >> Div with action buttons
+
+        To move the buttons to the right side
+    */
+
+    float: right;
+}
+section.auiScriptor>div:nth-child(3)>div:nth-child(5)>button, section.auiTemplater>div:nth-child(3)>div:nth-child(3)>button
+{
+    /*
+        Targets >> Action buttons
+
+        To add margin between buttons
+    */
+
+    margin: 2em 0.5em;
+}
+
+/***********************************************************************************
+    The Main Dashboard Section
+***********************************************************************************/
+
+section#mainDashboard>article>h1
+{
+    font-size: inherit;
+}
+section#mainDashboard>article>div
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-bottom: 2em;
+}
+
+/***********************************************************************************
+    
+***********************************************************************************/
+
+.smart-accordion-item-header
+{
+    height: 48px !important;
+}
+img.thumbnail, video.thumbnail, audio.thumbnail
+{
+    /*
+        Targets >> img, video and audio elements with thumbnail class
+    */
+    
+    border: 1px solid rgb(221, 221, 221);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 4px;
+    width: 8em;
+}
+section.auiTemplater>div:nth-child(3)>table:nth-child(1)>tbody:nth-child(1)>tr:nth-child(1)>td,
+section.auiTemplater>div:nth-child(3)>smart-tabs:nth-child(2)>div:nth-child(1)>div:nth-child(2)>smart-tab-item:nth-child(1)>div:nth-child(1)>table:nth-child(1)>tbody:nth-child(1)>tr>td,
+section.auiTemplater>div:nth-child(3)>smart-tabs:nth-child(2)>div:nth-child(1)>div:nth-child(2)>smart-tab-item:nth-child(2)>div:nth-child(1)>table:nth-child(1)>tbody:nth-child(1)>tr>td,
+section.auiTemplater>div:nth-child(3)>smart-tabs:nth-child(2)>div:nth-child(1)>div:nth-child(2)>smart-tab-item:nth-child(3)>div:nth-child(1)>table:nth-child(1)>tbody:nth-child(1)>tr>td
+{
+    /* 
+        Targets >> a <section> element with a class of "auiTemplater". It then selects the third <div> element that is a direct child of this <section> element. 
+        Next, it targets the first <table> element that is a direct child of this selected <div> element. 
+        Following this, it selects the first <tbody> element within the previously targeted <table> element. 
+        Subsequently, it targets the first <tr> element that is a direct child of this <tbody> element. 
+        Finally, it selects the <td> element that is a direct child of this <tr> element. 
+        This selector is designed to pinpoint a specific <td> element within a structured HTML document.
+
+        Selects a <section> element with a class of "auiTemplater". Targets the third <div> that is a direct child of the selected <section> element.
+        Selects the second smart-tabs element that is a direct child of the previously selected <div> element. Targets the first <div> that is a direct child of the selected smart-tabs element.
+        Selects the second <div> that is a direct child of the previously selected <div> element. Targets the first, second and third smart-tab-item element that are a direct child of the selected <div> element.
+        Selects the first <div> that is a direct child of the previously selected smart-tab-item element. Targets the first <table> element that is a direct child of the selected <div> element.
+        Selects the first <tbody> element that is a direct child of the previously selected <table> element. Targets all <tr> elements that are direct children of the selected <tbody> element.
+        Selects all <td> elements that are direct children of the previously selected <tr> elements.
+
+        To add padding between tds.
+    */
+
+    padding: 0.4em;
+}
+section.auiTemplater fieldset
+{
+    /* 
+        Targets >> fieldset descendant <section> element with class name "auiTemplater".
+
+        To behave like inline elements, allowing them to sit next to each other horizontally and
+        have a minimum width but can expand based on their content or other CSS properties.
+    */
+
+    display: inline-block;
+    min-width: auto;
+}
+section.auiTemplater>div:nth-child(3)>smart-tabs:nth-child(2)>div:nth-child(1)>div:nth-child(2)>smart-tab-item:nth-child(2)>div:nth-child(1)>table:nth-child(1)>tbody:nth-child(1)>tr:nth-child(5)>td:nth-child(1)
+{
+    /* 
+        Targets >> Refers to a section with the class "auiTemplater". It selects the third child <div> directly under the "auiTemplater" section.
+        Inside that third <div>, it selects the second element with the class "smart-tabs". Within the second "smart-tabs", it selects the first child <div>.
+        Inside that first <div>, it selects the second child <div>. Within the second <div>, it selects the second element with the class "smart-tab-item".
+        Inside that second "smart-tab-item", it selects the first child <div>. Within the first <div>, it selects the first <table> element.
+        Inside the first <table>, it selects the first <tbody> element. Within the first <tbody>, it selects the fifth <tr> (table row) element.
+        Inside the fifth <tr>, it selects the first <td> (table data) element.
+
+        To ensure that the text in the <td> aligns its content to the top of the cell.
+    */
+
+    vertical-align: top;
+}
+section.auiTemplater>div:nth-child(3)>smart-tabs:nth-child(2)>div:nth-child(1)>div:nth-child(2)>smart-tab-item:nth-child(2)>div:nth-child(1)>table:nth-child(1)>tbody:nth-child(1)>tr:nth-child(4)>td:nth-child(2),
+section.auiTemplater>div:nth-child(3)>smart-tabs:nth-child(2)>div:nth-child(1)>div:nth-child(2)>smart-tab-item:nth-child(2)>div:nth-child(1)>table:nth-child(1)>tbody:nth-child(1)>tr:nth-child(5)>td:nth-child(2)
+{
+    /* 
+        Targets >> Refers to a section with the class "auiTemplater". It selects the third child <div> directly under the "auiTemplater" section.
+        Inside that third <div>, it selects the second element with the class "smart-tabs". Within the second "smart-tabs", it selects the first child <div>.
+        Inside that first <div>, it selects the second child <div>. Within the second <div>, it selects the second element with the class "smart-tab-item".
+        Inside that second "smart-tab-item", it selects the first child <div>. Within the first <div>, it selects the first <table> element.
+        Inside the first <table>, it selects the first <tbody> element. Within the first <tbody>, it selects the fourth and fifth <tr> (table row) element.
+        Inside the fourth and fifth <tr>, it selects the second <td> (table data) element.
+
+        To add padding between tds
+    */
+
+    padding-bottom: 2em;
+}
+section.auiTemplater>div:nth-child(1)>input:nth-child(1)
+{
+    /* 
+        Targets >> Refers to a <section> element with the class "auiTemplater".
+        Points to the first child <div> directly under the <section> element. Refers to the first child <input> under the first <div>.
+
+        To set the width to 25%
+    */
+
+    width: 25%;
+}
+section.auiTemplater>div:nth-child(3)
+{
+    /* 
+        Targets >> Refers to a <section> element with the class "auiTemplater".
+        Points to the third class <div>.
+    */
+
+    height: auto;
+}
+section.auiTemplater>div:nth-child(3)>table:nth-child(1)>tbody:nth-child(1)>tr:nth-child(1)>td:nth-child(2)
+{
+    /* 
+        Target >> a <section> element with a class of "auiTemplater". It then selects the third <div> element that is a direct child of this <section> element. 
+        Next, it targets the first <table> element that is a direct child of this selected <div> element. 
+        Following this, it selects the first <tbody> element within the previously targeted <table> element. 
+        Subsequently, it targets the first <tr> element that is a direct child of this <tbody> element. 
+        Finally, it selects the second <td> element that is a direct child of this <tr> element. 
+        This selector is designed to pinpoint a specific <td> element within a structured HTML document.
+    */
+
     width: 100%;
 }
-.panel
+section.auiTemplater>div:nth-child(3)>table:nth-child(1)>tbody:nth-child(1)>tr:nth-child(1)>td:nth-child(2)>input:nth-child(1)
+{
+    /* 
+        Target >> a <section> element with a class of "auiTemplater". It then selects the third <div> element that is a direct child of this <section> element. 
+        Next, it targets the first <table> element that is a direct child of this selected <div> element. 
+        Following this, it selects the first <tbody> element within the previously targeted <table> element. 
+        Subsequently, it targets the first <tr> element that is a direct child of this <tbody> element. 
+        Then, it selects the second <td> element that is a direct child of this <tr> element. 
+        Finally, it selects the first <input> element that is direct of this <td> element.
+        This selector is designed to pinpoint a specific <td> element within a structured HTML document.
+    */
+
+    width: inherit;
+}
+smart-tabs smart-tab-item>.smart-container
+{
+    /*
+        Targets >> Elements with class .smart-container underneath <smart-tabs>.
+    */
+
+    overflow: auto;
+}
+smart-window .smart-footer button
+{
+    padding: 0 1em;
+}
+smart-window .smart-footer button:not(:last-child)
+{
+    margin-right: 1em;
+}
+paxa-periodicity
+{
+    width: 100%;
+}
+paxa-periodicity div.e-multiselect.e-input-group
+{
+    margin-bottom: 1em;
+}
+paxa-periodicity>section
+{
+    width: 70%;
+}
+paxa-periodicity table
+{
+    width: 100%;
+}
+paxa-periodicity input
+{
+    margin: 0.4em;
+}
+paxa-periodicity div.dayChoices label,
+paxa-periodicity div.hour label,
+paxa-periodicity div.minute label
+{
+    display: block;
+}
+paxa-periodicity .calendar
+{
+    border: 1px solid rgb(215, 215, 215);
+    background-color: white;
+    border-radius: 0.4em;
+    justify-content: center;
+} 
+paxa-periodicity .calendar>smart-calendar
+{
+    overflow-y: auto;
+    width: 100%;
+}
+paxa-periodicity .smart-calendar .smart-calendar-week .smart-calendar-cell[today]
 {
     background: white;
-    border: 1px solid var(--paxa-border-colour);
-    border-radius: 10px;
-    overflow: hidden;
+    border-color: white;
+    color: rgb(100, 100, 100);
+}
+paxa-periodicity .timestamps
+{
+    border: 1px solid rgb(215, 215, 215);
+    background-color: white;
+    border-radius: 0.4em;
+    display: block;
+    margin-left: 0.9em;
+    overflow-y: auto;
+    padding: 0 1.5em;
+}
+paxa-periodicity .timestamps, paxa-periodicity .allDateList
+{
+    min-width: 27em;
+    min-height: 40em; 
+}
+paxa-periodicity .timestamps>p>span, .allDateList smart-accordion-item p span
+{
+    color: rgb(156, 0, 0);
+    cursor: default;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-right: 0.3em;
+    margin-left: 1em;
+    margin-bottom: 0.3em;
+    position: relative;
+    top: -0.2em
+}
+paxa-periodicity .timestamps>p
+{
+    display: flex;
+    justify-content: space-between;
+}
+paxa-periodicity .timestamps>div:nth-child(1)
+{
+    font-size: 1.3em;
+    padding-top:0.8em;
+}
+paxa-periodicity .timestamps>div:nth-child(2)
+{
+    color: black;
+    font-weight: 200;
+    font-size: 1.2em;
+    margin-bottom: 2em;
+}
+paxa-periodicity .timestamps>div:nth-child(2)>button
+{
+    margin-left: 1em;
+}
+paxa-periodicity .timestamps>div:nth-child(2)>.hour, .timestamps>div:nth-child(2)>.minute, .timestamps>div:nth-child(2)>.meridian
+{
+    background-color: transparent;
+    border: 0.1px solid rgb(215, 215, 215);
+    margin: 0.1em;
+}
+paxa-periodicity .allDateList
+{
+    border: 1px solid rgb(215, 215, 215);
+    background-color: white;
+    border-radius: 0.4em;
+    display: block;
+    margin-left: 0.9em;
+    overflow-y: auto;
+}
+paxa-periodicity .allDateList smart-accordion
+{
+    height: 100%;
+}
+paxa-periodicity .allDateList smart-accordion-item button
+{
+    background-color: rgb(226, 224, 224);
+    border-color: rgb(226, 224, 224);
+    border-radius: 0 0 0.2em 0;
+    border: none;
+    color: rgb(55, 55, 55);
+    font-size: 1.4em;
+    position: relative;
+    right: 1.2em;
+}
+paxa-periodicity .allDateList smart-accordion-item button:hover
+{
+    background-color: rgb(238, 131, 131);
+    color: white;
+}
+paxa-periodicity .allDateList smart-accordion-item p
+{
+    display: flex;
+    justify-content: space-between;
+}
+paxa-periodicity button.retrieveButton
+{
+    margin: 0.5em 0;
+}
+paxa-periodicity div.result
+{
+    display: flex;
+}
+smart-window.fui-window.fui-window.templaterAddVariable
+{
+    height: 45em;
+    width: auto;
+}
+smart-window.templaterAddVariable div#variableTree
+{
+    height: 38em;
+    overflow: auto;
+}
+smart-window.templaterAddVariable div.containerVariableSelector
+{
+    /*
+        Targets >> A `div` element with the class `containerVariableSelector`
+        that is a descendant of a `smart-window` element with the class `templaterAddVariable`
+    */
+
+    border: 1px solid rgb(187, 187, 187);
+    padding: 5px;
+    width: 40em;
+}
+smart-accordion .smart-empty::after
+{
+    /* 
+        Target >> The smart-accordion element when there is no items
+        
+        Override the content from "No accordion items" to "No Items"
+    */
+
+    content: "No Items";
+}
+.swal2-container
+{
+    z-index: 99999 !important;
 }
 
 /***********************************************************************************
-    Selected State
+    Message Box
 ***********************************************************************************/
 
-.slot-button
+.msgBoxOverlay
 {
-    align-items: center;
-    background: rgb(251 252 248);
-    border: 1px solid rgb(223 232 215);
-    border-radius: 6px;
-    color: rgb(101 128 85);
+    background-color: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    position: fixed;
+    width: 100%;
+    z-index: 999999;
+}
+.msgBoxModal
+{
+    background-color: rgb(255, 255, 255);
+    border-radius: 0.7em;
+    height: auto;
+    left: 50%;
+    max-width: 48%;
+    min-width: 30%;
+    padding: 0 1.4em;
+    position: fixed;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+}
+.msgBoxModal header
+{
+    background-color: rgb(36, 58, 181);
+    border-top-left-radius: 0.7em;
+    border-top-right-radius: 0.7em;
+    margin: 0 -1.4em;
+}
+.msgBoxModal header h1
+{
+    color: rgb(250, 250, 250);
+    font-size: 1.2em;
+    margin: 0;
+    padding: 0.6em 0 0.6em 1em; 
+}
+.msgBoxModal p
+{
+    margin: 0.84em 0;
+    text-align: justify;
+}
+.msgBoxModal article
+{
+    margin: 0.84em 0;
+}
+.msgBoxModal .collapseDetails
+{
+    color: rgb(100, 100, 100);
+    cursor: pointer;
+    width: fit-content;
+}
+.msgBoxModal .collapseDetails:hover
+{
+    color: rgb(50, 50, 50);
+}
+.msgBoxModal .detailsArrow
+{
+    display: inline-block;
+    transition: transform 0.3s;
+}
+.msgBoxModal .rotate
+{
+    transform: rotate(90deg);
+}
+.msgBoxModal .detailsSpan
+{
+    text-decoration: underline;
+}
+.msgBoxModal .details
+{
+    background-color: rgb(249, 249, 249);
+    border: 1px solid;
+    display: none;
+    height: 20vh;
+    margin-top: 0.5em;
+    overflow: scroll;
+    padding: 0.5em;
+    text-align: justify;
+}
+.msgBoxModal progress
+{
+    width: 95%;
+    padding: 1.4em;
+}
+.msgBoxModal footer
+{
+    background-color: rgb(231, 231, 231);
+    border-bottom-left-radius: 0.7em;
+    border-bottom-right-radius: 0.7em;
     display: flex;
-    flex-direction: column;
-    font-size: 11px;
-    gap: 5px;
-    padding: 12px 4px;
+    justify-content: center;
+    margin: 0 -1.4em;
 }
-.slot-button:hover:not(:disabled)
+.msgBoxModal footer:has(button:only-child)
 {
-    background: rgb(238 243 230);
-    border-color: rgb(143 174 117);
+    justify-content: right;
 }
-.slot-button.selected
+.msgBoxModal footer button
+{
+    margin: 0.7em 1.4em 0.7em 0;
+}
+
+@keyframes rotate 
+{
+    0% 
+    { 
+        transform: rotate(0deg); 
+    }
+    100% 
+    { 
+        transform: rotate(360deg); 
+    }
+} 
+div.b-overlay-scrollbar .b-virtual-scrollers .b-virtual-scroller.b-widget-scroller
 {
     /*
-        Targets >> The selected appointment time
+        Target >> Scrollbars of Bryntum Scheduler
 
-        Distinguish the time the patient has chosen before confirming the appointment.
+        To show the horizontal scrollbar for Bryntum Scheduler, in Firefox for Ubuntu
     */
 
-    background: rgb(232 239 220);
-    border-color: rgb(128 165 100);
-    box-shadow: inset 0 0 0 1px rgb(128 165 100);
-    color: rgb(69 98 47);
+	pointer-events: auto;
+}
+
+/***********************************************************************************
+    Toast
+***********************************************************************************/
+
+#toastList
+{
+    bottom: 0%;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    justify-content: flex-end;
+    margin: 1em;
+    position: fixed;
+    right: 0%;
+    width: 20%;
+    z-index: 89999;
+}
+#toastList article.toastBox
+{
+    animation: slide-in 0.25s ease-in;
+    background-color: rgb(242, 242, 242);
+    border: solid rgb(169,169,169) 0.1em;
+    box-shadow: 0.2em 0.2em 1em rgb(169,169,169);
+    display: block;
+    font-size: inherit;
+    width: 100%;
+}
+#toastList article.fadeOut
+{
+    animation: fade-out 0.25s ease-out;
+}
+#toastList header
+{
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5em;
+}
+#toastList h1.title
+{
+    color: rgb(242, 242, 242);
+    font-size: inherit;
+    margin: 0;
+    max-width: 20em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#toastList button.cancel
+{
+    background: none;
+    border: none;
+    color: rgb(242, 242, 242);
+    padding: 0;
+    width: 2em;
+}
+#toastList button.cancel:hover
+{
+    cursor: pointer;
+}
+#toastList div.body
+{
+    max-height: 16em;
+    overflow-y: auto;
+    padding: 0.5em 0 0.5em 0.5em;
+    text-align: left;
+    width: 100%;
+}
+#toastList span.content
+{
+    display: inline-block;
+    padding-right: 0.5em;
+    text-align: justify;
+}
+#toastList footer
+{
+    display: flex;
+    justify-content: center;
+}
+#toastList progress
+{
+    margin: 0 0.5em;
+    width: 100%;
+}
+
+@keyframes slide-in
+{
+    from
+    {
+        opacity: 0;
+        transform: translateX( 100% );
+    }
+    to
+    {
+        opacity: 1;
+        transform: translateX( 0 );
+    }
+}
+@keyframes fade-out
+{
+    from 
+    {
+        opacity: 1;
+    }
+    to    
+    {
+        opacity: 0;
+    }
+}
+
+/***********************************************************************************
+    Tree
+***********************************************************************************/
+
+ul.atmosphere.tree
+{
+    padding: 0;
+    margin: 0;
+}
+ul.atmosphere.tree li.node
+{
+    list-style-type: none;
+    width: fit-content;
+}
+ul.atmosphere.tree li.node div.label
+{
+    border-radius: 4px;
+    cursor: default;
+    display: flex;
+    margin: 2px 0;
+}
+ul.atmosphere.tree li.node div.label:hover
+{
+    background-color: rgb(240, 240, 240);
+}
+ul.atmosphere.tree li.node div.label input.checkbox
+{
+    accent-color: rgb(0, 102, 204);
+    align-self: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    height: 1.1em;
+    margin-right: 8px;
+    margin-left: 4px;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 1.1em;
+}
+ul.atmosphere.tree li.node div.label img.icon
+{
+    flex-shrink: 0;
+    height: 1.3em;
+    margin-right: 8px;
+    vertical-align: middle;
+    width: 1.3em;
+}
+ul.atmosphere.tree li.node span.chevron
+{
+    cursor: pointer;
+    height: 16px;
+    line-height: 16px;
+    margin-right: 8px;
+    text-align: center;
+    user-select: none;
+    width: 16px;
+}
+ul.atmosphere.tree li.node span.chevron:hover
+{
+    color: rgb(0, 0, 0);
+}
+ul.atmosphere.tree li.node ul
+{
+    margin-left: 20px;
+    overflow: hidden;
+    padding-left: 0;
+}
+ul.atmosphere.tree li.node ul.collapsed
+{
+    max-height: 0;
+}
+ul.atmosphere.tree li.node span.text
+{
+    flex: 1;
+}
+ul.atmosphere.tree li.node.node-selected > div.label.label-selected
+{
+    background-color: rgb(227, 242, 253);
+    color: rgb(25, 118, 210);
+}
+
+/***********************************************************************************
+    Card Container
+***********************************************************************************/
+
+div.cardContainer,
+table.cardContainer
+{
+    /*
+        Styling an element with class of card container
+    */
+
+    background-color: rgb( 255, 255, 255 );
+    box-shadow: 0 0.4em 1.2em rgba( 0, 0, 0, 0.08 );
+    border: 0.1em solid rgba( 0, 0, 0, 0.05 );
+    border-radius: 1em;
+    overflow: hidden;
+    transition: all 0.3s ease;
+} 
+div.cardContainer:hover
+{
+    box-shadow: 0 0.8em 2.4em rgba( 0, 0, 0, 0.12 );
+    transform: translateY( -0.2em );
+} 
+div.cardContainer header
+{
+    align-items: center;
+    display: flex;
+    padding: 0.5em;
+}
+div.cardContainer header div.cardTitle
+{
+    /*
+        Increase the title inside the header element.
+    */
+
+    color: rgb( 68, 68, 68 );
+    font-size: 1.1em;
+    font-weight: 600;
+}
+div.cardContainer>div.cardBody
+{
+    padding: 0.5em;
+}
+
+/***********************************************************************************
+    Context Menu
+***********************************************************************************/
+
+menu.atmosphere.contextMenu
+{
+    background: rgb(255, 255, 255);
+    border: 1px solid rgb(204, 204, 204);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    margin: 0;
+    position: fixed;
+    padding: 2px 0;
+    white-space: nowrap;
+}
+menu.atmosphere.contextMenu li.menuItem
+{
+    align-items: center;
+    border-radius: 2px;
+    display: flex;
+    list-style: none;
+    margin: 1px 0;
+}
+menu.atmosphere.contextMenu li.menuItem.disabled
+{
+    background-color: transparent;
+    color: rgb(153, 153, 153);
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.6;
+}
+menu.atmosphere.contextMenu li.menuItem:hover:not(.disabled),
+menu.atmosphere.contextMenu li.menuItem.active
+{
+    background-color: rgb(235, 235, 235);
+}
+menu.atmosphere.contextMenu li.menuItem div.label
+{
+    align-items: center;
+    display: flex;
+    cursor: pointer;
+    flex: 1;
+    gap: 6px;
+    padding: 4px 8px;
+}
+menu.atmosphere.contextMenu li.menuItem div.label img.icon
+{
+    flex-shrink: 0;
+    width: 1.2em;
+    height: 1.2em;
+}
+menu.atmosphere.contextMenu li.menuItem div.label span.text
+{
+    flex: 1;
+    margin: 0;
+}
+menu.atmosphere.contextMenu li.menuItem div.label .subMenuIndicator 
+{
+    display: none;
+    margin-left: auto;
+}
+menu.atmosphere.contextMenu li.menuItemSeparator
+{
+    list-style: none;
+    margin: 4px 0;
+    padding: 0;
+}
+menu.atmosphere.contextMenu li.menuItemSeparator hr
+{
+    border: none;
+    border-top: 1px solid rgb(204, 204, 204);
+    height: 0;
+    margin: 0;
+}
+
+/***********************************************************************************
+    Miscellaneous
+***********************************************************************************/
+
+.paxa.experimental::after
+{
+    background-color: rgb(128, 0, 0);
+    color: white;
+    content: "Experimental";
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.5;
+    min-width: 12em;
+    opacity: 0.7;
+    padding: 0 3em 0 7em;
+    pointer-events: none;
+    position: fixed;
+    right: 0;
+    text-align: center;
+    top: 50px;
+    transform: rotate(45deg) translate(22%, -40%);
+    z-index: 99;
+}
+.paxa.experimental-window::after
+{
+    background-color: rgb(128, 0, 0);
+    color: white;
+    content: "Experimental";
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.5;
+    min-width: 8em;
+    opacity: 0.7;
+    padding: 0 2em 0 2em;
+    pointer-events: none;
+    position: fixed;
+    right: 0;
+    text-align: center;
+    top: 20px;
+    transform: rotate(45deg) translate(22%, -40%);
+    z-index: 99;
+}
+.paxa.verifiedByHumans::after
+{
+    background-color: rgb(0 128 0);
+    color: white;
+    content: "Verified by Humans";
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.5;
+    min-width: 12em;
+    opacity: 0.7;
+    padding: 0 3em 0 7em;
+    pointer-events: none;
+    position: fixed;
+    right: 0;
+    text-align: center;
+    top: 50px;
+    transform: rotate(45deg) translate(22%, -40%);
+    z-index: 99;
+}
+
+/***********************************************************************************
+    Property Grid
+***********************************************************************************/
+
+table.atmosphere.property-grid
+{
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    background-color: rgb(255 255 255);
+    border-radius: 0.25em;
+}
+table.atmosphere.property-grid th
+{
+    background-color: rgb(248 248 248);
+    border-bottom:0.1em solid rgb(204 204 204);
+    border-top: 0.1em solid rgb(204 204 204);
+    color: rgb(51 51 51);
+    font-weight: 600;
+    padding: 0.5em 0;
+    text-align: left;
+}
+table.atmosphere.property-grid th.property-grid-title
+{
+    background-color: rgb(240 240 240);
+    border-top: none;
+    color: rgb(34 34 34);
+    font-size: 1.1em;
+    font-weight: 700;
+    padding: 0.2em 0.6em;
+}
+table.atmosphere.property-grid td
+{
+    border-bottom: 0.1em solid rgb(238 238 238);
+    vertical-align: middle;
+}
+table.atmosphere.property-grid tr:last-child td
+{
+    border-bottom: none;
+}
+table.atmosphere.property-grid td:first-child
+{
+    border-right: 0.1em solid rgb(238 238 238);
+    background-color: rgb(250 250 250);
+    color: rgb(85 85 85);
+    font-weight: 500;
+    min-width: 7.5em;
+    padding: 0em 0.625em;
+    width: 40%;
+}
+table.atmosphere.property-grid td:last-child
+{
+    background-color: rgb(255 255 255);
+}
+/* Property Grid Input Fields */
+table.atmosphere.property-grid tbody tr td input,
+table.atmosphere.property-grid tbody tr td textarea,
+table.atmosphere.property-grid tbody tr td select
+{
+    border: none;
+    border-radius: 0.2em;
+    padding: 0.3em 0.4em;
+    width: 100%;
+}
+table.atmosphere.property-grid tbody tr td input[type="text"]:disabled,
+table.atmosphere.property-grid tbody tr td textarea:disabled,
+table.atmosphere.property-grid tbody tr td select:disabled
+{
+    background-color: rgb(245 245 245);
+    color: rgb(153 153 153);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+/* Property Grid Textarea */
+table.atmosphere.property-grid textarea
+{
+    line-height: 1.4;
+    min-height: 3.75em;
+    resize: vertical;
+}
+table.atmosphere.property-grid .property-grid-object-container table.atmosphere.property-grid
+{
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+}
+table.atmosphere.property-grid .property-grid-object-container table.atmosphere.property-grid td:first-child
+{
+    background-color: rgb(253 253 253);
+    color: rgb(102 102 102);
+    font-weight: 400;
+    width: 35%;
+}
+table.atmosphere.property-grid .property-grid-object-container table.atmosphere.property-grid td:last-child
+{
+    background-color: transparent;
+}
+/* Property Grid Modal Dialogue */
+table.atmosphere.property-grid div.property-grid-complex
+{
+    display: flex;
+}
+table.atmosphere.property-grid div.property-grid-complex>span
+{
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+table.atmosphere.property-grid .property-grid-complex button
+{
+    border: 0.1em solid rgb(128 128 128);
+    border-radius: 0.25em;
+    cursor: pointer;
+    margin-left: 0.5em;
+}
+
+/***********************************************************************************
+    File View
+***********************************************************************************/
+
+.file-view-container
+{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: auto;
+}
+.file-view-breadcrumb
+{
+    align-items: center;
+    background-color: rgb(248 248 252);
+    border-bottom: 1px solid rgb(224 224 232);
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.2em;
+    min-height: 2.2em;
+    padding: 0.3em 0.8em;
+}
+.file-view-breadcrumb-item
+{
+    font-size: 0.92em;
+    padding: 0.15em 0.3em;
+}
+.file-view-breadcrumb-item-clickable
+{
+    border-radius: 0.25em;
+    color: var(--paxa-primary-colour);
+    cursor: pointer;
+}
+.file-view-breadcrumb-item-clickable:hover
+{
+    background-color: rgb(230 232 248);
+    text-decoration: underline;
+}
+.file-view-breadcrumb-item-current
+{
+    font-weight: 600;
+}
+.file-view-breadcrumb-separator
+{
+    color: rgb(160 160 180);
+    font-size: 0.92em;
+}
+.atmosphere.file-view-grid
+{
+    display: grid;
+    gap: 3em;
+    padding: 0.5em;
+}
+.atmosphere.file-view-grid>.file-view-sub-grid
+{
+    display: grid;
+    gap: 1em;
+    grid-template-columns: repeat(auto-fill, minmax(18em, 1fr));
+}
+.file-view-item
+{
+    background-color: rgb(255 255 255);
+    border: 1px solid rgb(224 224 232);
+    border-radius: 0.5em;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    user-select: none;
+}
+.file-view-item:hover
+{
+    border-color: rgb(180 180 200);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+}
+.file-view-item-selected
+{
+    border-color: var(--paxa-primary-colour);
+    box-shadow: 0 0 0 2px rgb(36 58 181 / 0.18);
+    background-color: rgb(240 242 255);
+}
+.file-view-item-selected:hover
+{
+    border-color: var(--paxa-primary-colour);
+    box-shadow: 0 0 0 3px rgb(36 58 181 / 0.25);
+    background-color: rgb(235 238 255);
+}
+.file-view-item-drag-over
+{
+    border-color: rgb(36 58 181);
+    background-color: rgb(240 242 255);
+}
+.file-view-item-header
+{
+    background-color: rgb(245 245 250);
+    display: flex;
+    gap: 0.5em;
+    height: 50px;
+    overflow: hidden;
+    padding: 1em;
+}
+.file-view-item-thumbnail-img
+{
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+.file-view-item-icon
+{
+    max-height: 48px;
+    max-width: 48px;
+    object-fit: contain;
+    opacity: 0.7;
+}
+.file-view-item-folder-icon
+{
+    color: rgb(180 170 80);
+}
+.file-view-item-folder-icon svg
+{
+    height: 48px;
+    width: 48px;
+}
+.file-view-item-right-container
+{
+    margin-left: auto;
+}
+.file-view-item-directory .file-view-item-header
+{
+    background-color: rgb(208 206 232);
+}
+.file-view-item-info
+{
+    padding: 0.5em 0.6em;
+}
+.file-view-item-name
+{
+    align-self: center;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.file-view-item-metadata
+{
+    margin-top: 0.3em;
+}
+.file-view-item-metadata-row
+{
+    display: flex;
+    font-size: 0.88em;
+    justify-content: space-between;
+    line-height: 1.6;
+}
+.file-view-item-metadata-label
+{
+    color: rgb(120 120 140);
+    margin-right: 0.5em;
+}
+.file-view-item-metadata-value
+{
+    color: rgb(60 60 70);
+    overflow: hidden;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/***********************************************************************************
+    Name plate
+***********************************************************************************/
+
+fieldset.name-plate
+{
+    background: rgba(0 0 0 / 0.03);
+    border-radius: 0.3em;
+    box-shadow: none;
+    display: grid;
+    gap: 0.2em 0.8em;
+    margin-top: 0.4em;
+    padding: 0.3em 0.4em;
+}
+fieldset.name-plate article
+{
+    align-items: center;
+    display: flex;
+    font-size: 0.82em;
+    justify-content: space-between;
+    line-height: 1.6;
+}
+fieldset.name-plate article>span:first-child
+{
+    color: rgb(100, 100, 120);
+    margin-right: 0.4em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+fieldset.name-plate article>span:nth-child(2)
+{
+    color: rgb(30, 80, 160);
+    flex-shrink: 0;
+    font-weight: 600;
+}
+fieldset.name-plate>article>select:not(#Container select, .exclude-paxa, .smart-select)
+{
+    border-radius: 1em;
+    color: rgb(30, 80, 160);
+    font-size: inherit;
+    font-weight: 600;
+    max-width: 50%;
+    padding: 0 0.64em;
+}
+
+/***********************************************************************************
+    Tab View
+***********************************************************************************/
+
+.atmosphere.tabview
+{
+    display: flex;
+    overflow: hidden;
+}
+.atmosphere.tabview.tabview-placement-top
+{
+    flex-direction: column;
+}
+.atmosphere.tabview.tabview-placement-bottom
+{
+    flex-direction: column-reverse;
+}
+.atmosphere.tabview.tabview-placement-left
+{
+    flex-direction: row;
+}
+.atmosphere.tabview.tabview-placement-right
+{
+    flex-direction: row-reverse;
+}
+.atmosphere.tabview>.tabview-bar
+{
+    background-color: rgb(248 249 252);
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.144em;
+    padding: 0.288em;
+}
+.atmosphere.tabview>.tabview-bar.tabview-bar-horizontal
+{
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+}
+.atmosphere.tabview>.tabview-bar.tabview-bar-vertical
+{
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.atmosphere.tabview.tabview-placement-top>.tabview-bar
+{
+    border-bottom: 1px solid rgb(220 223 230);
+}
+.atmosphere.tabview.tabview-placement-bottom>.tabview-bar
+{
+    border-top: 1px solid rgb(220 223 230);
+}
+.atmosphere.tabview.tabview-placement-left>.tabview-bar
+{
+    border-right: 1px solid rgb(220 223 230);
+}
+.atmosphere.tabview.tabview-placement-right>.tabview-bar
+{
+    border-left: 1px solid rgb(220 223 230);
+}
+.atmosphere.tabview.tabview-alignment-start>.tabview-bar.tabview-bar-horizontal
+{
+    justify-content: flex-start;
+}
+.atmosphere.tabview.tabview-alignment-end>.tabview-bar.tabview-bar-horizontal
+{
+    justify-content: flex-end;
+}
+.atmosphere.tabview.tabview-alignment-start>.tabview-bar.tabview-bar-vertical
+{
+    justify-content: flex-start;
+}
+.atmosphere.tabview.tabview-alignment-end>.tabview-bar.tabview-bar-vertical
+{
+    justify-content: flex-end;
+}
+.atmosphere.tabview>.tabview-panel
+{
+    background-color: rgb(255 255 255);
+    flex: 1 1 auto;
+    overflow: auto;
+    padding: 1.152em;
+}
+.tabview-page
+{
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    border-radius: 0.288em;
+    color: rgb(80 85 100);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.936em;
+    gap: 0.432em;
+    max-width: 14.4em;
+    padding: 0.432em 0.864em;
+    user-select: none;
+    white-space: nowrap;
+}
+.tabview-page:hover
+{
+    background-color: rgb(235 238 245);
+}
+.tabview-page.tabview-page-active
+{
+    background-color: rgb(255 255 255);
+    box-shadow: 0 0.072em 0.144em rgba(0, 0, 0, 0.1);
+    color: var(--paxa-primary-colour);
+    font-weight: 500;
+}
+.tabview-page.tabview-page-drag-over
+{
+    background-color: rgb(230 235 255);
+    outline: 0.144em dashed rgb(36 58 181);
+    outline-offset: -0.144em;
+}
+.tabview-page>img.tabview-page-icon
+{
+    height: 1.008em;
+    width: 1.008em;
+}
+.tabview-page>span.tabview-page-name
+{
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tabview-page>span.tabview-page-close
+{
+    align-items: center;
+    border-radius: 0.216em;
+    color: rgb(130 135 150);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 1.008em;
+    height: 1.296em;
+    justify-content: center;
+    margin-left: 0.288em;
+    width: 1.296em;
+}
+.tabview-page>span.tabview-page-close:hover
+{
+    background-color: rgb(220 53 69);
+    color: rgb(255 255 255);
+}
+
+/***********************************************************************************
+    Navigational View
+***********************************************************************************/
+
+.partitioned
+{
+    display: grid;
+    grid-template-columns: 20% 1fr;
+    height: 100%;
+}
+.partitioned>aside
+{
+    background-color: rgb(241, 245, 249);
+	border-right: 1px solid rgb(221 221 221);
+	height: 100%;
+	overflow: auto;
+	padding: 1em;
+}
+
+/***********************************************************************************
+    Capsule
+***********************************************************************************/
+
+.capsule
+{
+    background-color: rgb(202 202 204);
+    border-radius: 1em;
+    color: rgb(90 90 90);
+    display: inline;
+    padding: 0.25em 0.7em;
+    white-space: nowrap;
+    width: fit-content;
+}
+.capsule.blue
+{
+    background-color: var(--paxa-primary-colour);
+    color: rgb(226 231 210);
+}
+.capsule.rouge
+{
+    background-color: var(--paxa-rouge);
+    color: rgb(226 231 210);
+}
+.capsule.green
+{
+    background-color: var(--paxa-green);
+    color: rgb(226 231 210);
+}
+
+/***********************************************************************************
+    Toolbar
+***********************************************************************************/
+
+nav.toolbar
+{
+    /* 
+        Targets >> selected the nav element with class name "toolbar".
+    */
+
+    align-items: center;
+    display: flex;
+    margin: 1em 0;
+}
+nav.toolbar>div:first-child
+{
+    /* 
+        Targets >> selected the first div element direct descendent of nav with class name "toolbar".
+    */
+
+    text-align: left;
+}
+nav.toolbar>div:last-child
+{
+    /* 
+        Targets >> selected the second div element direct descendent of nav with class name "toolbar".
+    */
+
+    flex: 1;
+    text-align: right;
+}
+nav.toolbar>div>input[type="text"]
+{
+    /* 
+        Targets >> selected the input element with type="text" that is direct descendent of a div element which is a direct child 
+        of a nav element with the class name toolbar.
+    */
+
+    width: 18em;
+}
+nav.verticalToolbar
+{
+    display: flex;
+    flex-direction: column;
 }
 
 /***********************************************************************************

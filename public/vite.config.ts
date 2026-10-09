@@ -8,8 +8,12 @@ export default defineConfig( ({ mode })=>
 
     return {
         plugins: [vue()],
-        server: {
-            proxy: {
+        server: 
+        {
+            proxy: 
+            {
+                "/login": { target, changeOrigin: true },
+                "/i": { target, changeOrigin: true }
             }
         }
     };
