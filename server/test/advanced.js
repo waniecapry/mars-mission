@@ -9,7 +9,7 @@ const { Center } = require( "../jsOut/Center" );
 const { Actor$Crew, Actor$Passenger } = require( "../jsOut/Actor" );
 const { Resource, Resource$Status } = require( "../jsOut/Resource" );
 const { Tier, Tier$Level } = require( "../jsOut/Tier" );
-const { Usage, Usage$Outcome } = require( "../jsOut/Usage" );
+const { Resource$Usage, Resource$Usage$Outcome } = require( "../jsOut/Resource.Usage" );
 
 test( "Resource use, history, reporting and crew resource management", async t=>
 {
@@ -163,15 +163,15 @@ test( "Resource use, history, reporting and crew resource management", async t=>
     assert.equal( (await request( "POST", "/i/resources/food/usage", undefined, crewLogin.cookie )).status, 403 );
     assert.equal( (await request( "POST", "/i/resources/missing/usage", undefined, passengerLogin.cookie )).status, 404 );
     assert.equal( (await request( "POST", "/i/resources/cabin/usage", undefined, passengerLogin.cookie )).status, 403 );
-    assert.equal( records[0].outcome, Usage$Outcome.Denied );
+    assert.equal( records[0].outcome, Resource$Usage$Outcome.Denied );
     assert.equal( (await request( "POST", "/i/resources/hygiene/usage", undefined, passengerLogin.cookie )).status, 409 );
-    assert.equal( records[1].outcome, Usage$Outcome.Unavailable );
+    assert.equal( records[1].outcome, Resource$Usage$Outcome.Unavailable );
 
     const firstUse = await request( "POST", "/i/resources/food/usage", undefined, passengerLogin.cookie );
 
     assert.equal( firstUse.status, 201 );
     assert.equal( firstUse.data.tierAtUse, Tier$Level.Silver );
-    assert.equal( firstUse.data.outcome, Usage$Outcome.Granted );
+    assert.equal( firstUse.data.outcome, Resource$Usage$Outcome.Granted );
     assert.equal( records.length, 3 );
 
     assert.equal( (await request( "GET", "/i/usage", undefined, otherLogin.cookie )).data.length, 0 );
@@ -246,7 +246,7 @@ test( "Failed database writes do not complete usage or resource changes", async 
 
     Resource.resourcesByMinimumTier.set( silver.level, new Set([resource]) );
 
-    await assert.rejects( Usage.record( passenger, resource ), error=>error === failure );
+    await assert.rejects( Resource$Usage.record( passenger, resource ), error=>error === failure );
     await assert.rejects( resource.setStatus( crew, Resource$Status.Inactive ), error=>error === failure );
     await assert.rejects( Resource.create( crew, "New", "", silver ), error=>error === failure );
 

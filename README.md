@@ -40,3 +40,18 @@ To run the application, make sure the setup has been done first. If not, please 
 - I use Codex to verify whether my implementation has cover all of the requirements given and the edge cases.
 - I use codex to implement the front end code based on what have I implemented for the backend.
 - I make the basic structure for vue, and ask AI to continue implementing it since the features are not that much, i do not make any tasks separation for the AI to start their work.
+
+## Front end testing made using AI
+
+- I use Codex to implement the testing for the front end feature using Playwright.
+- This is the prompt I used to ask Codex to start implementing it:
+
+"Add Playwright end-to-end testing to this frontend.
+
+Inspect the app, its package manager, routes, existing tests, and CI setup first. Install and configure Playwright Test using the project's conventions. Configure it to start the local app with `webServer` and use a `baseURL`. Add a clear test command and ignore generated reports and test artifacts.
+
+Write a small, meaningful suite for the real user journeys: page loading and navigation, the primary interaction or form, validation and feedback, and mobile behavior. Include keyboard interaction where relevant. Cover loading, empty, or error states when they can be reproduced reliably.
+
+Test what users see and do. Prefer role and label locators with Playwright's retrying assertions. Keep tests independent, use controlled test data, and avoid fixed sleeps, fragile CSS selectors, and broad screenshots of every page. Do not call production services or use production data.
+
+Run the suite, fix test setup issues and frontend defects it reveals, and rerun until it passes. If this project already has CI, add the Playwright suite to it. Finish by listing the scenarios covered, the command to run them, and any important gaps."
