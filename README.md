@@ -28,3 +28,5 @@ Sessions use the same MySQL settings unless `SESSION_STORE_HOST`, `SESSION_STORE
 - Im using Codex as my coding agent tool.
 - I use Codex to implement test cases and add more edge cases to speed up development process.
 - I use Codex to verify whether my implementation has cover all of the requirements given and the edge cases.
+- I use codex to implement the front end code based on what have I implemented for the backend.
+- I make the basic structure for vue, and ask AI to continue implementing it since the features are not that much, i do not make any tasks separation for the AI to start their work.
