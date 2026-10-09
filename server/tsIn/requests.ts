@@ -5,7 +5,7 @@ import { Center } from "./Center";
 import { Actor, Actor$Crew, Actor$Passenger, Actor$Role } from "./Actor";
 import { Tier } from "./Tier";
 import { Resource, Resource$Status } from "./Resource";
-import { Usage, Usage$Outcome } from "./Usage";
+import { Resource$Usage, Resource$Usage$Outcome } from "./Resource.Usage";
 
 export function handleRequests( app: Application ): void
 {
@@ -211,12 +211,12 @@ export function handleRequests( app: Application ): void
             return;
         }
 
-        const usage = await Usage.record( caller, resource );
+        const usage = await Resource$Usage.record( caller, resource );
 
-        if( usage.outcome === Usage$Outcome.Denied )
+        if( usage.outcome === Resource$Usage$Outcome.Denied )
             res.status( Center.HttpServer.status.forbidden ).json( { error: "Membership level does not permit this resource" } );
 
-        else if( usage.outcome === Usage$Outcome.Unavailable )
+        else if( usage.outcome === Resource$Usage$Outcome.Unavailable )
             res.status( Center.HttpServer.status.conflict ).json( { error: "Resource is unavailable" } );
 
         else res.status( Center.HttpServer.status.created ).json( usage );
@@ -232,7 +232,7 @@ export function handleRequests( app: Application ): void
             return;
         }
 
-        res.json( await Usage.getHistory( caller, caller ) );
+        res.json( await Resource$Usage.getHistory( caller, caller ) );
     });
     app.get( "/i/passengers/:id/usage", async (req: Request, res: Response)=> // Crew view of a passenger's history
     {
@@ -254,7 +254,7 @@ export function handleRequests( app: Application ): void
             return;
         }
 
-        res.json( await Usage.getHistory( caller, passenger ) );
+        res.json( await Resource$Usage.getHistory( caller, passenger ) );
     });
     app.get( "/i/activity", async (req: Request, res: Response)=> // Recent resource interactions for crew
     {
@@ -267,7 +267,7 @@ export function handleRequests( app: Application ): void
             return;
         }
 
-        res.json( await Usage.getActivity( caller ) );
+        res.json( await Resource$Usage.getActivity( caller ) );
     });
     app.get( "/i/reports/usage", async (req: Request, res: Response)=> // Crew report by tier and resource
     {
@@ -280,7 +280,7 @@ export function handleRequests( app: Application ): void
             return;
         }
 
-        res.json( await Usage.getReport( caller ) );
+        res.json( await Resource$Usage.getReport( caller ) );
     });
     app.get( "/i/passengers", (req: Request, res: Response)=> // Get the list of passengers
     {
