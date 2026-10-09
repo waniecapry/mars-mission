@@ -9,7 +9,7 @@ import { Usage, Usage$Outcome } from "./Usage";
 
 export function handleRequests( app: Application ): void
 {
-    const clientDirectory = resolve( __dirname, "../../client/dist" );
+    const clientDirectory = resolve( __dirname, "../../public/dist" );
 
     app.use( (req: Request, res: Response, next: NextFunction) =>
     {
