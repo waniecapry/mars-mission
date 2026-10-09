@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, onMounted, reactive, ref } from "vue";
+    import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
     import { api, ApiError, type Actor, type Resource, type Session, type TierLevel, type Resource$Usage, type Resource$Usage$Report } from "./api";
     import { dateTime, tierName } from "./format";
     import LoginView from "./components/LoginView.vue";
@@ -25,6 +25,7 @@
     const loginBusy = ref( false );
     const working = ref( false );
     const refreshing = ref( false );
+    const activityRefreshFailed = ref( false );
     const session = ref<Session | null>( null );
     const activeView = ref<View>( "overview" );
     const notice = ref<Notice | null>( null );
@@ -39,6 +40,9 @@
     const lastUpdated = ref<Date | null>( null );
     const passengerForm = reactive( { name: "", email: "", password: "", tier: 1 as TierLevel } );
     const resourceForm = reactive( { name: "", description: "", minimumTier: 1 as TierLevel } );
+    let activityRefreshTimer: ReturnType<typeof setInterval> | null = null;
+    let activityRefreshPending = false;
+    let activityRefreshVersion = 0;
 
     const actor = computed( ()=>session.value?.actor );
     const isCrew = computed( ()=>actor.value?.role === 0 );
@@ -62,6 +66,8 @@
         if( !session.value )
             return;
 
+        ++activityRefreshVersion;
+
         refreshing.value = true;
         notice.value = null;
 
@@ -81,6 +87,7 @@
                 passengers.value = passengerData;
                 activity.value = activityData;
                 report.value = reportData;
+                activityRefreshFailed.value = false;
             }
             else
             {
@@ -100,6 +107,41 @@
         finally
         {
             refreshing.value = false;
+        }
+    }
+    async function refreshCrewActivity(): Promise<void>
+    {
+        if( !isCrew.value || !lastUpdated.value || refreshing.value || working.value || activityRefreshPending || document.hidden )
+            return;
+
+        const crewId = actor.value!.id;
+        const version = activityRefreshVersion;
+        activityRefreshPending = true;
+
+        try
+        {
+            const [activityData, reportData] = await Promise.all
+            ([api<Resource$Usage[]>( "/i/activity" ), api<Resource$Usage$Report>( "/i/reports/usage" )]);
+
+            if( actor.value?.id !== crewId || version !== activityRefreshVersion || refreshing.value || working.value )
+                return;
+
+            activity.value = activityData;
+            report.value = reportData;
+            activityRefreshFailed.value = false;
+        }
+        catch( error )
+        {
+            if( actor.value?.id !== crewId || version !== activityRefreshVersion )
+                return;
+
+            if( error instanceof ApiError && error.status === 401 )
+                showError( error );
+            else activityRefreshFailed.value = true;
+        }
+        finally
+        {
+            activityRefreshPending = false;
         }
     }
     async function restoreSession(): Promise<void>
@@ -149,6 +191,8 @@
     }
     async function signOut(): Promise<void>
     {
+        ++activityRefreshVersion;
+
         working.value = true;
 
         try
@@ -162,6 +206,7 @@
             history.value = [];
             passengerHistory.value = [];
             activity.value = [];
+            activityRefreshFailed.value = false;
             report.value = { byTier: [], popularResources: [] };
             lastUpdated.value = null;
             selectedPassengerId.value = null;
@@ -178,6 +223,8 @@
     }
     async function perform( action: ()=>Promise<void> ): Promise<void>
     {
+        ++activityRefreshVersion;
+
         working.value = true;
         notice.value = null;
 
@@ -307,19 +354,40 @@
                 resources.value = resourcesResult.value;
 
             if( usageError )
+            {
+                if( usageError instanceof TypeError || (usageError instanceof ApiError && [502, 503, 504].includes( usageError.status )) )
+                    throw new Error( "Could not confirm whether the facility use was recorded. Check your history before trying again." );
+
                 throw usageError;
+            }
 
-            if( historyResult.status === "rejected" )
-                throw historyResult.reason;
+            const refreshErrors = [historyResult, resourcesResult].filter( result=>result.status === "rejected" ).map( result=>result.reason );
 
-            if( resourcesResult.status === "rejected" )
-                throw resourcesResult.reason;
+            if( refreshErrors.some( error=>error instanceof ApiError && error.status === 401 ) )
+            {
+                session.value = null;
+                notice.value = { text: `${resource.name} use recorded. Your session expired; sign in again to view updated records.`, tone: "error" };
 
-            showSuccess( `${resource.name} use recorded.` );
+                return;
+            }
+
+            showSuccess( refreshErrors.length ? `${resource.name} use recorded. Some records could not be refreshed; use Refresh data to update them.` : `${resource.name} use recorded.` );
         });
     }
 
+    watch( isCrew, crew=>
+    {
+        if( activityRefreshTimer !== null )
+            clearInterval( activityRefreshTimer );
+
+        activityRefreshTimer = crew ? setInterval( ()=>{ void refreshCrewActivity(); }, 5000 ) : null;
+    });
     onMounted( ()=>{ void restoreSession(); } );
+    onUnmounted( ()=>
+    {
+        if( activityRefreshTimer !== null )
+            clearInterval( activityRefreshTimer );
+    });
 </script>
 
 <template>
@@ -334,6 +402,7 @@
                 <div class="topbar-actions"><span v-if="lastUpdated" class="updated-label">Updated {{ dateTime( lastUpdated.getTime() ) }}</span><button class="button button-secondary refresh-button" type="button" :disabled="refreshing" @click="refreshWorkspace">{{ refreshing ? "Refreshing…" : "Refresh data" }}</button></div>
             </header>
             <main class="main-content" id="workspace-main">
+                <div v-if="isCrew && activityRefreshFailed" class="notice notice-error" role="status">Activity updates paused. Use Refresh data to try again.</div>
                 <div v-if="notice" class="notice" :class="notice.tone === 'error' ? 'notice-error' : 'notice-success'" :role="notice.tone === 'error' ? 'alert' : 'status'"><span>{{ notice.text }}</span><button type="button" aria-label="Dismiss message" @click="notice = null">×</button></div>
                 <section v-if="!lastUpdated" class="panel data-state" role="status">
                     <span class="eyebrow">MISSION RECORDS</span>
