@@ -10,6 +10,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 echo -e "$LARROWS BEGIN npm install\n"
 
 npm install --prefix "$SCRIPT_DIR/server"
+npm install --prefix "$SCRIPT_DIR/public"
 
 echo -e "$LARROWS BEGIN database setup\n"
 
