@@ -28,7 +28,7 @@ To run the application, make sure the setup has been done first. If not, please 
 
 ## Project Extensions (Should implement when there's more time)
 - I was planning to use worker processes for the nodejs server. But seems like I may not need this now, maybe if this is a production project, i will make worker processes to handle incoming HTTP client or websocket client.
-- Instead of using REST API, I was actually planing to use SOcket.io broadcasting event. But maybe not now for this assesment.
+- Instead of using REST API, I was actually planing to use SOcket.io broadcasting event. So that anything changes qat the backend can be sent back to the front end on the spot by emitting event from the server side.
 - Improve the database design and add appropriate constraints.
 - Record an audit trail for all actions beyond the resource interactions already tracked.
 - Add the ability to delete passengers and resources.
