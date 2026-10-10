@@ -23,7 +23,8 @@ To run the application, make sure the setup has been done first. If not, please 
 
 ## Testing
 
-- For testing, use npm test.
+- Backend: run `npm test` from `server`.
+- Frontend browser tests: run `npm run test:e2e` from `public`. On a fresh machine, run `npx playwright install chromium` there first. Playwright starts the Vite frontend and supplies isolated API responses; the tests do not require MySQL or real accounts.
 
 ## Project Extensions (Should implement when there's more time)
 - I was planning to use worker processes for the nodejs server. But seems like I may not need this now, maybe if this is a production project, i will make worker processes to handle incoming HTTP client or websocket client.
