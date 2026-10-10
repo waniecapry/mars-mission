@@ -141,16 +141,6 @@ export namespace Center
 
         return false;
     }
-    export function renderLoginView(): string
-    {
-        return "";
-    }
-    export function renderMainView( caller: Actor ): string
-    {
-        const aux: Aux = Center.toAux( caller );
-
-        return "";
-    }
 
     interface HttpServer$Options
     {
